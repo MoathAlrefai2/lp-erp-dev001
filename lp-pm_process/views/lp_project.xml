@@ -16,4 +16,28 @@
         </field>
     </record>
 
+	<record id="lp_project_group_by_type" model="ir.ui.view">
+		<field name="model">project.project</field>
+		<field name="inherit_id" ref="project.view_project_project_filter" />
+		<field name="arch" type="xml">
+			<search>
+				<group expand="0" string="Group By">
+					<filter string="Type" name="type" context="{'group_by':'type'}"/>
+				</group>
+			</search>
+		</field>
+	</record>
+
+	<record id="lp_project_type_kanban" model="ir.ui.view">
+		<field name="model">project.project</field>
+		<field name="inherit_id" ref="project.view_project_kanban" />
+		<field name="arch" type="xml">
+			<xpath expr="//div[@class='o_primary']" position="inside">
+				<p>
+					<field name="type" />
+				</p>
+			</xpath>
+		</field>
+	</record>
+
 </odoo>
