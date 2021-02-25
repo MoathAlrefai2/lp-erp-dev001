@@ -34,6 +34,9 @@
           </group>
         </page>
       </xpath>
+      <field name="user_id" position="after">
+        <field name="lp_department_head" widget="many2one_avatar_user" />
+      </field>
     </field>
   </record>
 

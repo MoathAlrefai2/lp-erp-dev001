@@ -24,4 +24,5 @@ class LP_Project(models.Model):
 
     lp_budget = fields.Char('Budget')
     lp_date_end = fields.Date('End Date')
+    lp_department_head = fields.Many2one('res.users', string='Department Head')
 
