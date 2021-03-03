@@ -28,15 +28,28 @@
       <xpath expr="//page[@name='settings']" position="after">
         <page name="lp_BudgetTimeline" string="Budget and Timeline">
           <group>
-            <field name="lp_budget" />
-            <field name="date_start" />
-            <field name="lp_date_end" />
+            <group>
+              <field name="lp_budget" />
+              <field name="date_start" readonly="1"/>
+              <field name="lp_date_end" />
+            </group>
+
+            <group>
+              <field name="lp_proposed_budget" />
+              <field name="lp_proposed_date_start"/>
+              <field name="lp_proposed_date_end" />
+              <!--<button name="pick_one" class="oe_inline oe_stat_button" type="object" style="background:rgba(46, 210, 162,0.2);" string="- 1" icon="fa-sign-out"/>-->
+            </group>
           </group>
         </page>
       </xpath>
       <field name="user_id" position="after">
         <field name="lp_department_head" widget="many2one_avatar_user" />
       </field>
+      <xpath expr="//div[hasclass('oe_chatter')]" position="inside">
+        <field name="message_ids" widget="mail_thread"/>
+      </xpath>
+
     </field>
   </record>
 
@@ -57,7 +70,7 @@
     <field name="model">project.project</field>
     <field name="inherit_id" ref="project.view_project_kanban" />
     <field name="arch" type="xml">
-      <xpath expr="//div[@class='o_primary']" position="inside">
+      <xpath expr="//div[hasclass('o_primary')]" position="inside">
         <p>
           <field name="lp_type" />
         </p>
