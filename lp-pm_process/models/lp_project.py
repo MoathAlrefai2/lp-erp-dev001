@@ -22,20 +22,24 @@ class LP_Project(models.Model):
          ('lp_closed', 'Closed')],
         'Status', default="lp_new")
 
-    lp_budget = fields.Char('Budget', readonly=True)
-    lp_date_end = fields.Date('End Date', readonly=True)
+    lp_budget = fields.Char('Budget', readonly=True, tracking=True)
+    date_start = fields.Date(readonly=True, tracking=True)
+    lp_date_end = fields.Date('End Date', readonly=True, tracking=True)
     lp_department_head = fields.Many2one('res.users', string='Department Head')
 
-    lp_proposed_budget = fields.Char('Proposed Budget')
-    lp_proposed_date_start = fields.Date('Proposed Start Date')
-    lp_proposed_date_end = fields.Date('Proposed End Date',)
+    lp_proposed_budget = fields.Char('Proposed Budget', tracking=True)
+    lp_proposed_date_start = fields.Date('Proposed Start Date', tracking=True)
+    lp_proposed_date_end = fields.Date('Proposed End Date', tracking=True)
 
 
-    #def pick_one(self):
-    #    """ This method used to customize display name of the record """
-    #    result = []
-    #    for record in self:
-    #        rec_name = "%s (%s)" % (record.name, record.date_start)
-    #        result.append((record.id, rec_name))
-    #    return result
+    def approve_proposed_values(self):
+        self.ensure_one()
+        #self.message_post(body=msg, subject='Reminder',subtype='mt_comment')
+        self.lp_budget = self.lp_proposed_budget
+        self.date_start = self.lp_proposed_date_start
+        self.lp_date_end = self.lp_proposed_date_end
+        self.lp_proposed_budget = ''
+        self.lp_proposed_date_start = ''
+        self.lp_proposed_date_end = ''
+        #Log the change into history
 

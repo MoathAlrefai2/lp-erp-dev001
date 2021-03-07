@@ -30,7 +30,7 @@
           <group>
             <group>
               <field name="lp_budget" />
-              <field name="date_start" readonly="1"/>
+              <field name="date_start"/>
               <field name="lp_date_end" />
             </group>
 
@@ -38,7 +38,7 @@
               <field name="lp_proposed_budget" />
               <field name="lp_proposed_date_start"/>
               <field name="lp_proposed_date_end" />
-              <!--<button name="pick_one" class="oe_inline oe_stat_button" type="object" style="background:rgba(46, 210, 162,0.2);" string="- 1" icon="fa-sign-out"/>-->
+              <button name="approve_proposed_values" class="btn btn-success" type="object" string="Approve the proposed values"/>
             </group>
           </group>
         </page>
