@@ -38,7 +38,7 @@
               <field name="lp_proposed_budget" />
               <field name="lp_proposed_date_start"/>
               <field name="lp_proposed_date_end" />
-              <button name="approve_proposed_values" class="btn btn-success" type="object" string="Approve the proposed values"/>
+              <button name="approve_proposed_values" class="btn btn-success" type="object" string="Approve the proposed values" groups="lp-pm_process.lp_group_project_department_head"/>
             </group>
           </group>
         </page>
