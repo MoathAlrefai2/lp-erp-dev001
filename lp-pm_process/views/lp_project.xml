@@ -38,13 +38,20 @@
               <field name="lp_proposed_budget" />
               <field name="lp_proposed_date_start"/>
               <field name="lp_proposed_date_end" />
-              <button name="approve_proposed_values" class="btn btn-success" type="object" string="Approve the proposed values" groups="lp-pm_process.lp_group_project_department_head"/>
+              <button name="approve_proposed_values" class="btn btn-success" type="object" string="Approve the proposed values" groups="lp-pm_process.lp_group_project_approver"/>
             </group>
+          </group>
+        </page>
+        <page name="lp_DevOps" string="DevOps Sync Settings">
+          <group>
+            <field name="lp_devops_token"/>
+            <field name="lp_devops_org_url"  widget="url" />
+            <field name="lp_devops_project_name"/>
           </group>
         </page>
       </xpath>
       <field name="user_id" position="after">
-        <field name="lp_department_head" widget="many2one_avatar_user" options="{'no_create': True}"/>
+        <field name="lp_approver" widget="many2one_avatar_user" options="{'no_create': True}"/>
       </field>
       <xpath expr="//div[hasclass('oe_chatter')]" position="inside">
         <field name="message_ids" widget="mail_thread"/>
