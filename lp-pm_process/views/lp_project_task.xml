@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="lp_project_task_view" model="ir.ui.view">
+    <field name="model">project.task</field>
+    <field name="inherit_id" ref="project.view_task_form2" />
+    <field name="arch" type="xml">
+      <xpath expr="//page[@name='extra_info']" position="after">
+        <page name="lp_DevOps" string="DevOps Info">
+          <group>
+            <group string="General">
+              <field name="lp_devops_ref_id"/>
+              <field name="lp_devops_project_name"/>
+              <field name="lp_devops_changed_date"/>
+              <field name="lp_devops_area"/>
+              <field name="lp_devops_iteration"/>
+            </group>
+            <group string="Parents">
+              <field name="lp_devops_epic"/>
+              <field name="lp_devops_feature"/>
+              <field name="lp_devops_requirement"/>
+            </group>
+            <group string="Effort Hours">
+              <field name="lp_devops_original_estimate"/>
+              <field name="lp_devops_remaining_work"/>
+              <field name="lp_devops_completed_work"/>
+            </group>
+            <group string="Schedual">
+              <field name="lp_devops_start_date"/>
+              <field name="lp_devops_finish_date"/>
+            </group>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+
+</odoo>
