@@ -7,7 +7,7 @@ class LP_Project_Task(models.Model):
 
 
     #DevOps fields
-    lp_devops_ref_id = fields.Char('Reference Id', readonly=True)
+    lp_devops_ref_id = fields.Integer('Reference Id', readonly=True)
     lp_devops_changed_date = fields.Date('Changed Date', readonly=True)
     lp_devops_project_name = fields.Char('Project Name', readonly=True)
     lp_devops_area = fields.Char('Area', readonly=True)

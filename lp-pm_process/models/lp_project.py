@@ -4,6 +4,13 @@ from urllib.parse import urlparse
 from odoo import models, fields, api
 from odoo.exceptions import AccessError, ValidationError
 
+#sudo pip3 install vsts
+from vsts.vss_connection import VssConnection
+
+#sudo pip3 install msrest
+from msrest.authentication import BasicAuthentication
+from vsts.work_item_tracking.v4_1.models.wiql import Wiql
+
 #_logger = logging.getLogger(__name__)
 
 class LP_Project(models.Model):
@@ -79,3 +86,79 @@ class LP_Project(models.Model):
         else:
             raise AccessError('Only Admin or project\'s DH can approve the change')
         
+    #def emit(msg, *args):
+    #    #print(msg % args)
+    #    _logger.warning(msg % args)
+
+
+    #def print_work_item(work_item):
+    #    emit(
+    #    "{0} {1}: {2}".format(
+    #        work_item.fields["System.WorkItemType"],
+    #        work_item.id,
+    #        work_item.fields["System.Title"],
+    #    ))
+
+    def sync_devops_task(self, devops_task, odoo_task):
+        # do nothing
+        odoo_task.lp_devops_ref_id = devops_task.id
+
+
+    def devops_sync(self):
+        self.ensure_one()
+        personal_access_token = self.lp_devops_token
+        organization_url = self.lp_devops_org_url
+        project_name = self.lp_devops_project_name
+
+        if (not personal_access_token) or (not organization_url) or (not project_name):
+            raise ValidationError('Please check you DevOps token and DevOps project URL')
+
+        credentials = BasicAuthentication('', personal_access_token)
+        connection = VssConnection(base_url=organization_url, creds=credentials)
+        wiql = Wiql(query=f"""select [System.Id] From WorkItems Where [System.WorkItemType] = 'Task' AND [System.TeamProject] = '{project_name}' order by [System.Id] desc""")
+
+        wit_client = connection.get_client('vsts.work_item_tracking.v4_1.work_item_tracking_client.WorkItemTrackingClient')
+        wiql_results = wit_client.query_by_wiql(wiql).work_items
+
+        if wiql_results:
+            # WIQL query gives a WorkItemReference with ID only
+            # => we get the corresponding WorkItem from id
+
+            tasks_to_be_synced = []
+            #odoo_tasks = self.env['project.task']
+            odoo_task_ids = self.env['project.task'].search([('project_id', '=', self.id)]).ids
+            for task in self.env['project.task'].browse(odoo_task_ids):
+                if task.lp_devops_ref_id: #odoo task already connected to devops task
+                    work_item = wit_client.get_work_item(int(task.lp_devops_ref_id))
+                    self.sync_devops_task(work_item, task)
+                    tasks_to_be_synced.append(task.lp_devops_ref_id)
+
+            tasks_to_be_inserted = [wit_client.get_work_item(int(tmp_devops_task.id)) for tmp_devops_task in wiql_results if tmp_devops_task.id not in tasks_to_be_synced]
+            for work_item in tasks_to_be_inserted:
+                #print_work_item(work_item)
+                #_logger.warning("{0} {1}: {2}".format(
+                #    work_item.fields["System.WorkItemType"],
+                #    work_item.id,
+                #    work_item.fields["System.Title"]))
+                tmp_description = ''
+                if "System.Description" in work_item.fields:
+                    tmp_description = work_item.fields["System.Description"]
+
+                tmp_task = {
+                    'name': work_item.fields["System.Title"],
+                    'description': tmp_description,
+                    'project_id': self.id,
+                    'lp_devops_ref_id': work_item.id
+                    }
+                self.env['project.task'].create(tmp_task)
+
+
+            #work_items = (wit_client.get_work_item(int(res.id)) for res in wiql_results)
+            #for work_item in work_items:
+                ##print_work_item(work_item)
+                #_logger.warning("{0} {1}: {2}".format(
+                    #work_item.fields["System.WorkItemType"],
+                    #work_item.id,
+                    #work_item.fields["System.Title"]))
+
+
