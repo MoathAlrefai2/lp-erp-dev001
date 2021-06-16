@@ -45,7 +45,35 @@ class LP_Project(models.Model):
     lp_devops_org_url = fields.Char('Organization URL', readonly=True)
     lp_devops_project_name = fields.Char('Project Name', readonly=True)
 
+    # method notify_update to send notification from PM TO Dp head
+    def notify_dept_head(self, message):
+        notification_ids = [(0, 0, {
+            'res_partner_id': self.lp_approver.partner_id.id,
+            'notification_type': 'inbox'
+        })]
+        self.message_post(
+            body='Values proposed by ' + str(self.user_id.partner_id.name) + " :" + message + "need approval",
+            message_type="notification",
+            author_id=self.env.user.partner_id.id,
+            notification_ids=notification_ids)
 
+    # write method (when click save call notify_update)
+    def write(self, vals):
+        message = ""
+        flag = False
+        if 'lp_proposed_budget' in vals:
+            message = message + "Proposed budget (" + str(vals['lp_proposed_budget']) + ") "
+            flag = True
+        if 'lp_proposed_date_start' in vals:
+            message = message + "Proposed Start Date (" + str(vals['lp_proposed_date_start']) + ") "
+            flag = True
+        if 'lp_proposed_date_end' in vals:
+            message = message + "Proposed End Date (" + str(vals['lp_proposed_date_end']) + ") "
+            flag = True
+        if flag:
+            self.notify_dept_head(message)
+        res = super(LP_Project, self).write(vals)
+        return res
     @api.constrains('lp_devops_link')
     def _check_lp_devops_link(self):
         for record in self:
