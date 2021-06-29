@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_wizard_lp" model="ir.ui.view">
+        <field name="name">project.wizard.form</field>
+        <field name="model">project.wizard</field>
+        <field name="arch" type="xml">
+            <form string="generation fichier">
+                <group>
+                    <h2> Sync devops has been completed </h2>
+
+                </group>
+                <group>
+                <field name="lp_updates_counter"/>
+                    <field name="lp_insert_counter"/>
+                 <field name="lp_error_counter"/>
+                </group>
+                <footer>
+                    <button string="OK" special="cancel" class="oe_highlight"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
+

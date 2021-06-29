@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+<record id="lp_project_task_view_lp" model="ir.ui.view">
+<field name="name">project.task.tree.search</field>
+<field name="model">project.task</field>
+<field name="inherit_id" ref="project.view_task_search_form"/>
+<field name="arch" type="xml">
+             <xpath expr="//field[@name='name']" position="after">
+                          <field name="lp_devops_ref_id"/>
+            </xpath>
+               <xpath expr="//filter[@name='user']" position="after">
+                          <filter string="State" name="lp_task_state" context="{'group_by': 'lp_task_state'}"/>
+            </xpath>
+</field>
+</record>
 
   <record id="lp_project_task_view" model="ir.ui.view">
     <field name="model">project.task</field>
@@ -10,15 +23,19 @@
           <group>
             <group string="General">
               <field name="lp_devops_ref_id"/>
+                <field name="lp_devops_priority"/>
               <field name="lp_devops_project_name"/>
               <field name="lp_devops_changed_date"/>
               <field name="lp_devops_area"/>
               <field name="lp_devops_iteration"/>
+            <field name="lp_task_state" string="State"  />
+             <field name="date_last_stage_update" string="State changed date" />
             </group>
             <group string="Parents">
               <field name="lp_devops_epic"/>
               <field name="lp_devops_feature"/>
               <field name="lp_devops_requirement"/>
+
             </group>
             <group string="Effort Hours">
               <field name="lp_devops_original_estimate"/>
@@ -26,12 +43,17 @@
               <field name="lp_devops_completed_work"/>
             </group>
             <group string="Schedual">
+
               <field name="lp_devops_start_date"/>
               <field name="lp_devops_finish_date"/>
+
             </group>
           </group>
         </page>
-      </xpath>
+     </xpath>
+<!-- <xpath expr="//field[@name='kanban_state']" position="after">-->
+
+<!--      </xpath>-->
     </field>
   </record>
 
