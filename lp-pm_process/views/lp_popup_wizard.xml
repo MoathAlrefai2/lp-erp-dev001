@@ -4,9 +4,9 @@
         <field name="name">project.wizard.form</field>
         <field name="model">project.wizard</field>
         <field name="arch" type="xml">
-            <form string="generation fichier">
+            <form string="Information form">
                 <group>
-                    <h2> Sync devops has been completed </h2>
+                    <h2> Sync DevOps has been completed </h2>
 
                 </group>
                 <group>
