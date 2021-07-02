@@ -132,9 +132,8 @@ class LP_Project(models.Model):
         tmp_task = self.get_task(work_item)#tmp_task
         tmp_tags = self.get_tags(work_item)#tmp_tags
         update_counter=0
-
         if "System.ChangedDate" in work_item.fields:
-            if task.lp_devops_changed_date != tmp_task.lp_devops_changed_date: #or str(record.changed state) != changed_date
+            if task.lp_devops_changed_date != datetime.strptime(work_item.fields["System.ChangedDate"],"%Y-%m-%dT%H:%M:%S.%fz"): #tmptask.lp_devops_changed_date > cause error , must convert to date format then compare
              update_counter= update_counter+1
              task.write(tmp_task)
              try:
@@ -151,9 +150,9 @@ class LP_Project(models.Model):
             if tags:
                 tags = tags.split("; ")
                 for tag in tags:
-                    if not self.env['project.tags'].sudo().search([('name', '=', tag)]):
-                        self.env['project.tags'].sudo().create({'name': tag})
                     lp_s = self.env['project.tags'].search([('name', '=', tag)])
+                    if not lp_s:
+                        self.env['project.tags'].sudo().create({'name': tag})
                     tmp_tags.append((4, lp_s[0].id))
         return tmp_tags
     def get_task(self,work_item):
@@ -302,10 +301,8 @@ class LP_Project(models.Model):
         if users:
             return users[0].id
         else:
-            if self.project_id:
-                return self.project_id[0].user_id.id
-            else:
-                ''
+                return self.user_id.id
+
 class LP_Popup_Wizard(models.TransientModel):
     _name = 'project.wizard'
     lp_updates_counter = fields.Integer('Updated tasks:', readonly=True)
