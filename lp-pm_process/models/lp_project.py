@@ -133,7 +133,7 @@ class LP_Project(models.Model):
         tmp_tags = self.get_tags(work_item)#tmp_tags
         update_counter=0
         if "System.ChangedDate" in work_item.fields:
-            if task.lp_devops_changed_date != datetime.strptime(work_item.fields["System.ChangedDate"],"%Y-%m-%dT%H:%M:%S.%fz"): #tmptask.lp_devops_changed_date > cause error , must convert to date format then compare
+            if task.lp_devops_changed_date != tmp_task.get('lp_devops_changed_date'):
              update_counter= update_counter+1
              task.write(tmp_task)
              try:
@@ -263,19 +263,26 @@ class LP_Project(models.Model):
         if wiql_results:
             tasks_to_be_synced = []
             odoo_task_ids = self.env['project.task'].search([('project_id', '=', self.id)]).ids
-            try:
-             for task in self.env['project.task'].browse(odoo_task_ids):
-                if task.lp_devops_ref_id: #odoo task already connected to devops task
+
+            for task in self.env['project.task'].browse(odoo_task_ids):
+                try:
+                 if task.lp_devops_ref_id: #odoo task already connected to devops task
                     work_item = wit_client.get_work_item(int(task.lp_devops_ref_id))
                     count_updates = count_updates + self.update_task(work_item,task)
                     tasks_to_be_synced.append(task.lp_devops_ref_id)
+                except Exception as e:
+                       count_error_task = count_error_task + 1
+                       _logger.exception(e)
 
-             tasks_to_be_inserted= [wit_client.get_work_item(int(tmp_devops_task.id)) for tmp_devops_task in wiql_results if tmp_devops_task.id not in tasks_to_be_synced]
-             for work_item in tasks_to_be_inserted:
-                 count_insert = count_insert + self.insert_task(work_item)
-            except:
-                count_error_task = count_error_task+1
-                _logger.error('ERROR: sync not done sucssfully!')
+
+            tasks_to_be_inserted= [wit_client.get_work_item(int(tmp_devops_task.id)) for tmp_devops_task in wiql_results if tmp_devops_task.id not in tasks_to_be_synced]
+            for work_item in tasks_to_be_inserted:
+                 try:
+                  count_insert = count_insert + self.insert_task(work_item)
+                 except Exception as e:
+                     count_error_task = count_error_task + 1
+                     _logger.exception(e)
+
             return {
             'name': 'Information',
             'type': 'ir.actions.act_window',
@@ -293,7 +300,6 @@ class LP_Project(models.Model):
         except :
             _logger.error('ERROR: email not valid on this task!')
         return email.strip("<>")
-
 
     def search_user(self,AssignedTo=''):
         email = self.get_email(AssignedTo)
