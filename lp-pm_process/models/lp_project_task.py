@@ -5,7 +5,7 @@ from odoo import models, fields, api
 class LP_Project_Task(models.Model):
     _inherit = ['project.task']
 
-    lp_devops_priority = fields.Integer('Task Priority', readonly=True)
+    lp_devops_priority = fields.Integer(string='Task Priority', readonly=True)
     #DevOps fields
     lp_devops_ref_id = fields.Integer('Reference Id', readonly=True)
     lp_devops_changed_date = fields.Datetime('Changed Date', readonly=True)
