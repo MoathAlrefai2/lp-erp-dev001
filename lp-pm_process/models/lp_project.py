@@ -311,6 +311,7 @@ class LP_Project(models.Model):
 
 class LP_Popup_Wizard(models.TransientModel):
     _name = 'project.wizard'
+    _description = 'Pop up Wizard'
     lp_updates_counter = fields.Integer('Updated tasks:', readonly=True)
     lp_insert_counter = fields.Integer('Inserted tasks:', readonly=True)
     lp_error_counter = fields.Integer('Error tasks:', readonly=True)
