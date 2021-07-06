@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+ <record id="lp_contact_view_form" model="ir.ui.view">
+     <field name="name">contact_lp</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form" />
+    <field name="arch" type="xml">
+           <xpath expr="//field[@name='type']" position="after">
+             <field name="lp_position"/>
+           </xpath>
+            <xpath expr="//field[@name='name']" position="replace">
+<!--                <field name="lp_ind" widget="label_selection" />-->
+              <field name="name" default_focus="1" placeholder="ind_" attrs="{'required' : [('type', '=', 'contact')]}"/>
+            </xpath>
+    </field>
+  </record>
+</odoo>

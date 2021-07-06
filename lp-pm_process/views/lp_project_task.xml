@@ -22,7 +22,7 @@
         <page name="lp_DevOps" string="DevOps Info">
           <group>
             <group string="General">
-              <field name="lp_devops_ref_id"/>
+              <field name="lp_devops_ref_id" string="Reference Id"/>
                 <field name="lp_devops_priority"/>
               <field name="lp_devops_project_name"/>
               <field name="lp_devops_changed_date"/>
@@ -42,7 +42,7 @@
               <field name="lp_devops_remaining_work"/>
               <field name="lp_devops_completed_work"/>
             </group>
-            <group string="Schedual">
+            <group string="Schedule">
 
               <field name="lp_devops_start_date"/>
               <field name="lp_devops_finish_date"/>

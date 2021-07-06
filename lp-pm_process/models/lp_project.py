@@ -45,14 +45,25 @@ class LP_Project(models.Model):
     lp_devops_token = fields.Char('Token')
     lp_devops_org_url = fields.Char('Organization URL', readonly=True)
     lp_devops_project_name = fields.Char('Project Name', readonly=True)
-
     # method notify_update to send notification from PM TO Dp head
+    def notify_send_mail(self):
+        mail_lp = self.env['mail.mail']
+        values = {}
+        values.update({'subject': ' proposed Values'})
+        values.update({'email_to': self.lp_approver.login})
+        values.update({'body_html': 'body'})
+        values.update({'body': 'Values proposed need approval'})
+        msg_id = mail_lp.create(values)
+        if msg_id:
+           mail_lp.send([msg_id])
+
     def notify_dept_head(self, message):
-        notification_ids = [(0, 0, {
+        if self.lp_proposed_budget or self.lp_proposed_date_start or self.lp_proposed_date_end:
+         notification_ids = [(0, 0, {
             'res_partner_id': self.lp_approver.partner_id.id,
             'notification_type': 'inbox'
-        })]
-        self.message_post(
+         })]
+         self.message_post(
             body='Values proposed by ' + str(self.user_id.partner_id.name) + " :" + message + "need approval",
             message_type="notification",
             author_id=self.env.user.partner_id.id,
@@ -72,6 +83,7 @@ class LP_Project(models.Model):
             message = message + "Proposed End Date (" + str(vals['lp_proposed_date_end']) + ") "
             flag = True
         if flag:
+            self.notify_send_mail()
             self.notify_dept_head(message)
         res = super(LP_Project, self).write(vals)
         return res
@@ -105,9 +117,10 @@ class LP_Project(models.Model):
 
         if is_admin or (is_dh and self.env.user.id == self.lp_approver.id):
             #self.message_post(body=msg, subject='Reminder',subtype='mt_comment')
-            self.lp_budget = self.lp_proposed_budget
-            self.date_start = self.lp_proposed_date_start
-            self.lp_date_end = self.lp_proposed_date_end
+            if self.lp_proposed_budget or self.lp_proposed_date_start or self.lp_proposed_date_end:
+               self.lp_budget = self.lp_proposed_budget
+               self.date_start = self.lp_proposed_date_start
+               self.lp_date_end = self.lp_proposed_date_end
             self.lp_proposed_budget = ''
             self.lp_proposed_date_start = ''
             self.lp_proposed_date_end = ''
