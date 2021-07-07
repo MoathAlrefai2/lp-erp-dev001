@@ -7,7 +7,7 @@ class LP_Crm(models.Model):
 
   lp_company_id = fields.Many2one('res.partner', 'company')#, domain="[('company_type', '=', 'company')]")#,domain="[('company_type', '=', 'company')]")
   #, domain="[('state', '=', 'Current')]")
-  lp_individual_id = fields.Many2many('res.partner', required=False)#, domain="[('lp_type', '=', 'lp_person')]")
+  lp_individual_id = fields.Many2many('res.partner')#, domain="[('lp_type', '=', 'lp_person')]")
   lp_OneDrive_url = fields.Char('OneDrive folder URL')
   lp_client_size = fields.Char('Size of the client')
   lp_industry = fields.Selection([('Automobiles_and_Components', 'Automobiles and Components'),
