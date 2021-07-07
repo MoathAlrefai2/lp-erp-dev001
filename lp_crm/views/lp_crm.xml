@@ -5,11 +5,22 @@
     <field name="model">crm.lead</field>
     <field name="inherit_id" ref="crm.crm_lead_view_form" />
     <field name="arch" type="xml">
+        <xpath expr="//button[@name='action_set_lost']" position="after">
+                                                    <button name="compute_going" string="Go Ahead"  type="object" groups="lp_crm.lp_group_crm_director" >
+                                              <field name="lp_go_ahead" widget="boolean_button" options='{"terminology": {
+        "string_true": "lp_go_ahead",
+        "hover_true": "lp_go_ahead",
+        "string_false": "Active",
+        "hover_false": "Active"
+    }}'/>
+                                          </button>
+        </xpath>
         <xpath expr="//field[@name='team_id']" position="after">
             <field name="lp_OneDrive_url" widget="url"/>
             <field name="lp_opportunity" />
             <field name="lp_industry"/>
             <field name="lp_client_size"/>
+            <field name="lp_director" widget="many2one_avatar_user" options="{'no_create': True}"/>
             <field name="lp_country" string="Country " options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
                </xpath>
              <xpath expr="//page[@name='lead']" position="replace">
@@ -38,7 +49,9 @@
                      <field name="lp_start_date"/>
                      <field name="lp_dept_head"/>
                      <field name="lp_end_date"/>
-                     <field name="lp_go_ahead" />
+
+
+<!--                     <field name="lp_go_ahead" />-->
                      <field name="lp_channel_source" string="Channel Source"/>
                      <field name="lp_others" string="Other Info" placeholder="add something.."/>
 

@@ -54,11 +54,19 @@ class LP_Crm(models.Model):
   lp_start_date = fields.Datetime('Start Date')
   lp_end_date = fields.Datetime('Finsh Date')
   lp_dept_head = fields.Many2one('res.partner', string='Department head')
-  lp_go_ahead = fields.Boolean('Go Ahead',compute='compute_going')
+  lp_director = fields.Many2one('res.users', string='Director', domain=lambda self: [('id', 'in', self.env.ref('lp_crm.lp_group_crm_director').users.ids)])
+  lp_go_ahead = fields.Boolean('GoAhead')
 
   @api.onchange('lp_opportunity')
   def compute_going(self):
-      self.lp_go_ahead = True if self.lp_opportunity == 'new' else False
+      self.ensure_one()
+      #is_admin = self.env.user.has_group('base.user_admin')
+      is_dh = self.env.user.id in self.env.ref('lp_crm.lp_group_crm_director').users.ids
+      if is_dh and self.env.user.id == self.lp_director.id:
+          if self.lp_opportunity == 'new':
+             self.lp_go_ahead = True
+          else:
+              self.lp_go_ahead =False
 
   # def write(self, values):
   #     if self.stage_id.name =='Won':

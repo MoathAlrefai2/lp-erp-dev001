@@ -11,6 +11,8 @@
     'author': "Leading Point",
     'website': "https://leading-point.com",
     'data': [
+        'security/lp_groups.xml',
+        'security/ir.model.access.csv',
 'views/lp_crm.xml'
     ],
     # "data":[
