@@ -5,7 +5,7 @@ class LP_Crm(models.Model):
   _inherit = 'crm.lead'
 
 
-  lp_company_id = fields.Many2one('res.partner', 'company', required=True)#, domain="[('company_type', '=', 'company')]")#,domain="[('company_type', '=', 'company')]")
+  lp_company_id = fields.Many2one('res.partner', 'company')#, domain="[('company_type', '=', 'company')]")#,domain="[('company_type', '=', 'company')]")
   #, domain="[('state', '=', 'Current')]")
   lp_individual_id = fields.Many2many('res.partner', required=False)#, domain="[('lp_type', '=', 'lp_person')]")
   lp_OneDrive_url = fields.Char('OneDrive folder URL')
@@ -43,7 +43,7 @@ class LP_Crm(models.Model):
   lp_country = fields.Many2one('res.country','country')
   lp_channel_source = fields.Char('Channel From')
   lp_others = fields.Text('Others Information') #description
-  contact_other_info = fields.Text('Others:') #description
+  contact_other_info = fields.Text('Others') #description
   lp_opportunity = fields.Selection([('new', 'New'),
                               ('Existing', 'Existing (e.g. CR)'),
                               ('outsourcing_contracts', 'Outsourcing contracts'),

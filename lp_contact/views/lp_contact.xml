@@ -9,9 +9,26 @@
              <field name="lp_position"/>
            </xpath>
             <xpath expr="//field[@name='name']" position="replace">
-<!--                <field name="lp_ind" widget="label_selection" />-->
-              <field name="name" default_focus="1" placeholder="ind_" attrs="{'required' : [('type', '=', 'contact')]}"/>
+                <field name="lp_label" widget="label_selection" style="color:Black;"/>
+              <field name="name" default_focus="1" placeholder="Name" attrs="{'required' : [('type', '=', 'contact')]}" />
             </xpath>
     </field>
   </record>
+<!--<data noupdate="1">-->
+
+<!--<record id="seq_demo" model="ir.sequence">-->
+
+<!--<field name="name">Sequence Name</field>-->
+
+<!--<field name="code">demo_seq</field>-->
+
+<!--<field name="padding">7</field>-->
+
+<!--<field name="prefix">ind_</field>-->
+
+<!--</record>-->
+
+<!--</data>-->
+
+
 </odoo>
