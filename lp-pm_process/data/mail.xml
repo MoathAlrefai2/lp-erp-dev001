@@ -1,0 +1,17 @@
+<odoo>
+    <data>
+         <record id="email_template" model="mail.template">
+            <field name="name">EMAIL TEMPLATE</field>
+            <field name="model_id" ref="LP_Project.model_sample.mail"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="email_from">${(object.user_id.partner_id.login}</field>
+            <field name="email_to">${object.lp_approver.partner_id.login}</field>
+            <field name="subject">${object.amc}</field>
+            <field name="body_html"><![CDATA[
+         <p>Dear ${(object.lp_approver.name)},<br/><br/>
+         values propused by project maneger need to be approve!<br/></p>
+              Regards,<br/>
+              ${(object.company_id.name)} ]]></field>
+        </record>
+    </data>
+</odoo>
