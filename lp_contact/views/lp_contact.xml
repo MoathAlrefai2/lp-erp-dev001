@@ -9,8 +9,10 @@
              <field name="lp_position"/>
            </xpath>
             <xpath expr="//field[@name='name']" position="replace">
-                <field name="lp_label" widget="label_selection" style="color:Black;"/>
-              <field name="name" default_focus="1" placeholder="Name" attrs="{'required' : [('type', '=', 'contact')]}" />
+                <div class="address_format">
+                <field name="lp_label" widget="label_selection"   style="width: 6%" attrs="{'invisible' : [('company_type', '=', 'company')]}" />
+              <field name="name" default_focus="1" placeholder="Name" attrs="{'required' : [('type', '=', 'contact')]}"  style="width: 55%"/>
+                </div>
             </xpath>
     </field>
   </record>

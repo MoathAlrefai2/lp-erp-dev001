@@ -16,7 +16,7 @@
           <page name="details" string="Details" >
                                 <group>
                                     <group string="Contact Information">
-             <field name="lp_company_id" string='Company ' widget="many2one_list"  domain="[('is_company', '=', True)]" options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
+             <field name="lp_company_id" string='Company ' widget="many2one_list"  domain="[('is_company', '=', True)]" options="{'no_open':True,'no_create':1,'no_create_edit':1}" required="1" />
              <field name="lp_individual_id" string='Individual' widget="many2many_tags"  domain="[('is_company', '=', False)]" options="{'no_open':True,'no_create':1,'no_create_edit':1}" />
               <field name="contact_other_info" placeholder="description..."/>
                                     </group>

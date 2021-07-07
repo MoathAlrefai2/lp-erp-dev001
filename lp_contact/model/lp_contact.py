@@ -13,14 +13,21 @@ class LP_Contact(models.Model):
 
   def write(self, values):
       prefix="ind_"
-      try:
-        if not values['name'].startswith(prefix):
+      if self.company_type == 'person':
+       try:
+        if not self.name.startswith('ind_'):
             values['name'] = prefix + values['name']
-      except:
-          pass
+            values['lp_label']=False
+        else:
+            values['lp_label'] = False
+       except:
+           pass
       return super(LP_Contact, self).write(values)
   @api.model
   def create(self, values):
        prefix = "ind_"
-       values['name'] = prefix + values['name']
+       if values['company_type'] == 'person':
+                values['name'] = prefix + values['name']
+                values['lp_label'] = False
+
        return super(LP_Contact, self).create(values)
