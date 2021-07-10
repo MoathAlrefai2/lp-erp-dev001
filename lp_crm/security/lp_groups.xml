@@ -4,4 +4,8 @@
         <field name="name">Director</field>
         <field name="users" eval="[(4, ref('base.user_admin'))]"/>
     </record>
+        <record id="lp_group_crm_dept_head" model="res.groups">
+        <field name="name">Department Head</field>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
 </odoo>

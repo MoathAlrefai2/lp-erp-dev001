@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 lp_access_director_approver,lp.access.crm.approver,model_crm_lead,lp_group_crm_director,1,1,1,1
+lp_access_depthead_approver,lp.access.crm.approver,model_crm_lead,lp_group_crm_dept_head,1,1,1,1

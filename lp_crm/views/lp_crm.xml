@@ -47,7 +47,7 @@
                      <field name="lp_budget" />
                      <field name="lp_budget_authority"/>
                      <field name="lp_start_date"/>
-                     <field name="lp_dept_head"/>
+                     <field name="lp_dept_head" widget="many2one_avatar_user" options="{'no_create': True}"/>
                      <field name="lp_end_date"/>
 
 

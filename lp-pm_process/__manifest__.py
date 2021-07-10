@@ -25,7 +25,6 @@
         'security/ir.model.access.csv',
         'views/lp_project.xml',
         'views/lp_project_task.xml',
-        'data/mail.xml',
         'views/lp_popup_wizard.xml'
     ],
 }

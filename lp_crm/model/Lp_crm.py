@@ -53,7 +53,7 @@ class LP_Crm(models.Model):
   lp_budget_authority = fields.Char(' Authority to use budget')
   lp_start_date = fields.Datetime('Start Date')
   lp_end_date = fields.Datetime('Finsh Date')
-  lp_dept_head = fields.Many2one('res.partner', string='Department head')
+  lp_dept_head = fields.Many2one('res.partner', string='Department head', domain=lambda self: [('id', 'in', self.env.ref('lp_crm.lp_group_crm_dept_head').users.ids)])
   lp_director = fields.Many2one('res.users', string='Director', domain=lambda self: [('id', 'in', self.env.ref('lp_crm.lp_group_crm_director').users.ids)])
   lp_go_ahead = fields.Boolean('GoAhead')
 
