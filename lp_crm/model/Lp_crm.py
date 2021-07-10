@@ -68,6 +68,45 @@ class LP_Crm(models.Model):
           else:
               self.lp_go_ahead =False
 
+  def notify_dept_head(self):
+      marketing_head=self.env['hr.department'].sudo().search([('name','=','Marketing')])
+      Support_head = self.env['hr.department'].sudo().search([('name', '=', 'Support')])
+      notification_marketing= [(0, 0, {
+              'res_partner_id': marketing_head.manager_id.user_id.partner_id.id,
+              'notification_type': 'inbox'
+          })]
+      notification_support= [(0, 0, {
+              'res_partner_id': Support_head.manager_id.user_id.partner_id.id,
+              'notification_type': 'inbox'
+          })]
+      #marketing_head.manager_id.user_id.partner_id.id
+      notification_delivery = [(0, 0, {
+              'res_partner_id': self.lp_dept_head.partner_id.id,
+              'notification_type': 'inbox'
+          })]
+      print('osama')
+      self.message_post(
+              body='Opportunity is Won!! ',
+              message_type="notification",
+              author_id=self.env.user.partner_id.id,
+              notification_ids=notification_delivery)
+      self.message_post(
+              body='Opportunity is Won!! ',
+              message_type="notification",
+              author_id=self.env.user.partner_id.id,
+              notification_ids=notification_support)
+      self.message_post(
+              body='Opportunity is Won!! ',
+              message_type="notification",
+              author_id=self.env.user.partner_id.id,
+              notification_ids=notification_marketing)
+
+  def write(self, vals):
+      if self.stage_id.name=='Won':
+       self.notify_dept_head()
+
+      res = super(LP_Crm, self).write(vals)
+      return res
 class LP_contact(models.Model):
   _inherit = 'res.partner'
 
