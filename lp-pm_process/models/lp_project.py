@@ -46,37 +46,18 @@ class LP_Project(models.Model):
     lp_devops_org_url = fields.Char('Organization URL', readonly=True)
     lp_devops_project_name = fields.Char('Project Name', readonly=True)
     # method notify_update to send notification from PM TO Dp head
-    def action_send_email(self):
-         self.ensure_one()
-         ir_model_data = self.env['ir.model.data']
-         try:
-             template_id = ir_model_data.get_object_reference('LP_Project', 'email_template')[1]
-         except ValueError:
-             template_id = False
-         try:
-             compose_form_id = ir_model_data.get_object_reference('mail', 'email_compose_message_wizard_form')[1]
-         except ValueError:
-             compose_form_id = False
-         ctx = {
-             'default_model': 'exmaple.email',
-             'default_res_id': self.ids[0],
-             'default_use_template': bool(template_id),
-             'default_template_id': template_id,
-             'default_composition_mode': 'comment',
-             'mark_so_as_sent': True,
-             'force_email': True
-         }
-         return {
-             'type': 'ir.actions.act_window',
-             'view_type': 'form',
-             'view_mode': 'form',
-             'res_model': 'mail.compose.message',
-             'views': [(compose_form_id, 'form')],
-             'view_id': compose_form_id,
-             'target': 'new',
-             'context': ctx,
-         }
 
+    # def action_send_notification(self):
+    #     self.env['mail.message'].create({
+    #         'email_from': self.env.user.partner_id.email,
+    #         'author_id': self.env.user.partner_id.id,
+    #         'model': 'mail.channel',
+    #         'type': 'comment',
+    #         'subtype_id': self.env.ref('mail.mt_comment').id,
+    #         'body': 'Body of the message',
+    #         'channel_ids': [(4, self.env.ref('lp-pm_process.lp_group_project_approver').id)],
+    #         'res_id': self.env.ref('lp-pm_process.lp_group_project_approver').id,
+    #     })
 
     def notify_send_mail(self):
         mail_lp = self.env['mail.mail']
@@ -115,9 +96,9 @@ class LP_Project(models.Model):
             message = message + "Proposed End Date (" + str(vals['lp_proposed_date_end']) + ") "
             flag = True
         if flag:
-            self.action_send_email()
-            self.notify_send_mail()
             self.notify_dept_head(message)
+            self.notify_send_mail()
+            #self.action_send_notification()
         res = super(LP_Project, self).write(vals)
         return res
     @api.constrains('lp_devops_link')

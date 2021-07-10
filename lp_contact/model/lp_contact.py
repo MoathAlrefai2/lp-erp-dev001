@@ -23,11 +23,3 @@ class LP_Contact(models.Model):
        except:
            pass
       return super(LP_Contact, self).write(values)
-  # @api.model
-  # def create(self, values):
-  #      prefix = "ind_"
-  #      if self.company_type == 'person':
-  #               values['name'] = prefix + values['name']
-  #               values['lp_label'] = False
-  #
-  #      return super(LP_Contact, self).create(values)

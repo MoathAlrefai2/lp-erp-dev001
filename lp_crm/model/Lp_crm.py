@@ -53,7 +53,7 @@ class LP_Crm(models.Model):
   lp_budget_authority = fields.Char(' Authority to use budget')
   lp_start_date = fields.Datetime('Start Date')
   lp_end_date = fields.Datetime('Finsh Date')
-  lp_dept_head = fields.Many2one('res.partner', string='Department head', domain=lambda self: [('id', 'in', self.env.ref('lp_crm.lp_group_crm_dept_head').users.ids)])
+  lp_dept_head = fields.Many2one('res.users', string='Department head', domain=lambda self: [('id', 'in', self.env.ref('lp_crm.lp_group_crm_dept_head').users.ids)])
   lp_director = fields.Many2one('res.users', string='Director', domain=lambda self: [('id', 'in', self.env.ref('lp_crm.lp_group_crm_director').users.ids)])
   lp_go_ahead = fields.Boolean('GoAhead')
 
@@ -68,37 +68,6 @@ class LP_Crm(models.Model):
           else:
               self.lp_go_ahead =False
 
-  # def write(self, values):
-  #     if self.stage_id.name =='Won':
-  #        self.notify_message()
-  #     return super(LP_Crm, self).write(values)
-  #
-  # def notify_message(self):
-  #     notification_ids = [(0, 0, {
-  #         'res_partner_id': self.user_id.partner_id.id,
-  #         'notification_type': 'inbox'
-  #     })]
-  #     self.message_post(
-  #         body='Opportunity is Won',
-  #         message_type="notification",
-  #         author_id=self.env.user.partner_id.id,
-  #         notification_ids=notification_ids)
-  # def create_qotation(self):
-  #     action = self.env["ir.actions.actions"]._for_xml_id("sale_crm.sale_action_quotations_new")
-  #     action['context'] = {
-  #         'search_default_opportunity_id': self.id,
-  #         'default_opportunity_id': self.id,
-  #         'search_default_partner_id': self.partner_id.id,
-  #         'default_partner_id': self.partner_id.id,
-  #         'default_team_id': self.team_id.id,
-  #         'default_campaign_id': self.campaign_id.id,
-  #         'default_medium_id': self.medium_id.id,
-  #         'default_origin': self.name,
-  #         'default_source_id': self.source_id.id,
-  #         'default_company_id': self.company_id.id or self.env.company.id,
-  #         'default_tag_ids': [(6, 0, self.tag_ids.ids)]
-  #     }
-  #     return action
 class LP_contact(models.Model):
   _inherit = 'res.partner'
 

@@ -6,7 +6,7 @@
     <field name="inherit_id" ref="crm.crm_lead_view_form" />
     <field name="arch" type="xml">
         <xpath expr="//button[@name='action_set_lost']" position="after">
-                                                    <button name="compute_going" string="Go Ahead"  type="object" groups="lp_crm.lp_group_crm_director" >
+                                                    <button name="compute_going" string="Go Ahead"  type="object" groups="lp_crm.lp_group_crm_director" attrs="{'invisible' : [('lp_opportunity', '!=', 'new')]}" >
                                               <field name="lp_go_ahead" widget="boolean_button" options='{"terminology": {
         "string_true": "lp_go_ahead",
         "hover_true": "lp_go_ahead",
@@ -47,7 +47,7 @@
                      <field name="lp_budget" />
                      <field name="lp_budget_authority"/>
                      <field name="lp_start_date"/>
-                     <field name="lp_dept_head" widget="many2one_avatar_user" options="{'no_create': True}"/>
+                     <field name="lp_dept_head"  options="{'no_create': True}"/>
                      <field name="lp_end_date"/>
 
 
