@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="test_rule_on_write_check_cont1ext" model="base.automation">
+            <field name="name"> check Stage Name in Negotiation or Dedicated Demo or Proposition or Presentation</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="trigger">on_write</field>
+            <field name="active" eval="True"/>
+            <field name="state">code</field>
+            <field name="filter_pre_domain">[["stage_id.name","in",["Negotiation","Dedicated Demo","Proposition","Presentation"]]]</field>
+            <field name="code">
+if record.stage_id.name in ['Prospect','Qualified'] :
+    raise UserError('this action not allowed in this stage!')
+            </field>
+        </record>
+            <record id="test_rule_on_write_check_context" model="base.automation">
+            <field name="name"> check Stage Name equal Won</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="trigger">on_write</field>
+            <field name="active" eval="True"/>
+            <field name="state">code</field>
+                 <field name="filter_pre_domain">[["stage_id.name","=",'Won']]</field>
+            <field name="code">
+if record.stage_id.name in ['Prospect','Presentation','Proposition','Dedicated Demo','Negotiation'] :
+    raise UserError('this action not allowed in this stage!')
+            </field>
+        </record>
+                <record id="test_rule_on_write_check" model="base.automation">
+            <field name="name"> check Stage Name equal Qualified</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="trigger">on_write</field>
+            <field name="active" eval="True"/>
+            <field name="state">code</field>
+                    <field name="filter_pre_domain">[["stage_id.name","=",'Qualified']]</field>
+            <field name="code">
+if record.stage_id.name in ['Presentation','Dedicated Demo','Negotiation','Proposition'] and not record.lp_go_ahead == True:
+    raise UserError('Please check Director Approval for this Opportunity!')
+            </field>
+        </record>
+                    <record id="test_rule_on_write" model="base.automation">
+            <field name="name"> check Stage Name Prospect</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="trigger">on_write</field>
+            <field name="active" eval="True"/>
+            <field name="state">code</field>
+                        <field name="filter_pre_domain">[["stage_id.name","=",'Prospect']]</field>
+            <field name="code">
+if record.stage_id.name in ['Won','Qualified'] and record.lp_budget == False and record.lp_budget_authority == False and record.lp_start_date == False and record.lp_end_date == False:
+    raise UserError('Please check mandatory fields for this Opportunity!')
+if record.stage_id.name in ['Presentation','Dedicated Demo','Negotiation','Proposition'] :
+    raise UserError('this action not allowed in this stage!')
+
+            </field>
+        </record>
+
+</odoo>

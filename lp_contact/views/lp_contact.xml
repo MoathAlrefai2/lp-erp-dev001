@@ -10,27 +10,14 @@
            </xpath>
             <xpath expr="//field[@name='name']" position="replace">
                 <div class="address_format">
-                <field name="lp_label" widget="label_selection"   style="width: 9%" attrs="{'invisible' : [('company_type', '=', 'company')]}" />
-              <field name="name" default_focus="1" placeholder="Name" attrs="{'required' : [('type', '=', 'contact')]}"  style="width: 58%"/>
+                <field name="lp_label_name" widget="label_selection"  style="background-color:grey;" attrs="{'invisible' : [('company_type', '=', 'company')]}" class="oe_edit_only"/>
+                <field name="lp_name"  placeholder="Name"  style="width: 58%" class="oe_read_only"/>
+              <field name="name" default_focus="1" placeholder="Name" attrs="{'required' : [('type', '=', 'contact')]}"  style="width: 58%" class="oe_edit_only"/>
+
                 </div>
             </xpath>
     </field>
   </record>
-<!--<data noupdate="1">-->
-
-<!--<record id="seq_demo" model="ir.sequence">-->
-
-<!--<field name="name">Sequence Name</field>-->
-
-<!--<field name="code">demo_seq</field>-->
-
-<!--<field name="padding">7</field>-->
-
-<!--<field name="prefix">ind_</field>-->
-
-<!--</record>-->
-
-<!--</data>-->
 
 
 </odoo>

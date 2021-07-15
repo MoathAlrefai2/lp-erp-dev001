@@ -1,13 +1,14 @@
 from odoo import models, fields, api
 
+class LP_mail(models.Model):
+  _inherit = 'mail.template'
 
 class LP_Crm(models.Model):
   _inherit = 'crm.lead'
 
 
-  lp_company_id = fields.Many2one('res.partner', 'company')#, domain="[('company_type', '=', 'company')]")#,domain="[('company_type', '=', 'company')]")
-  #, domain="[('state', '=', 'Current')]")
-  lp_individual_id = fields.Many2many('res.partner')#, domain="[('lp_type', '=', 'lp_person')]")
+  lp_company_id = fields.Many2one('res.partner', 'company')
+  lp_individual_id = fields.Many2many('res.partner')
   lp_OneDrive_url = fields.Char('OneDrive folder URL')
   lp_client_size = fields.Char('Size of the client')
   lp_industry = fields.Selection([('Automobiles_and_Components', 'Automobiles and Components'),
@@ -25,6 +26,7 @@ class LP_Crm(models.Model):
                                   ('Hospitality', 'Hospitality'),
                                   ('insurance', 'Insurance'),
                                   ('materials', 'Materials'),
+                                  ('logistics', 'Logistics'),
                                   ('Media_Entertainment', 'Media and Entertainment'),
                                   ('Pharmaceuticals_Biotechnology_LifeSciences', 'Pharmaceuticals, Biotechnology, and Life Sciences'),
                                   ('Real_Estate', 'Real Estate'),
@@ -56,17 +58,36 @@ class LP_Crm(models.Model):
   lp_dept_head = fields.Many2one('res.users', string='Department head', domain=lambda self: [('id', 'in', self.env.ref('lp_crm.lp_group_crm_dept_head').users.ids)])
   lp_director = fields.Many2one('res.users', string='Director', domain=lambda self: [('id', 'in', self.env.ref('lp_crm.lp_group_crm_director').users.ids)])
   lp_go_ahead = fields.Boolean('GoAhead')
+  lp_stage_name = fields.Char(related="stage_id.name", string='Stage Name')
+  lp_director_viewer = fields.Boolean(compute='_driector_approve_viewer')
+  stage_id = fields.Many2one(
+      'crm.stage', string='Stage', index=True, tracking=True,
+      compute='_compute_stage_id', readonly=False, store=True,
+      copy=False, group_expand='_read_group_stage_ids', ondelete='restrict',
+      domain="['|', ('team_id', '=', False), ('team_id', '=', team_id)]")
 
-  @api.onchange('lp_opportunity')
-  def compute_going(self):
+  @api.depends('lp_director')
+  def _driector_approve_viewer(self):
+      if self.env.user.id == self.lp_director.id:
+          self.lp_director_viewer = True
+      else:
+          self.lp_director_viewer = False
+
+
+  def Director_approver(self):
       self.ensure_one()
-      #is_admin = self.env.user.has_group('base.user_admin')
       is_dh = self.env.user.id in self.env.ref('lp_crm.lp_group_crm_director').users.ids
       if is_dh and self.env.user.id == self.lp_director.id:
-          if self.lp_opportunity == 'new':
-             self.lp_go_ahead = True
-          else:
-              self.lp_go_ahead =False
+             if self.lp_go_ahead==False:
+              self.lp_go_ahead = True
+             stages1 = self.env['crm.stage'].sudo().search([('name', '=', 'Presentation')])
+             if not stages1:
+                             self.env['crm.stage'].sudo().create({'name': 'Presentation'})
+
+             if stages1:
+                  stage = stages1[0]
+                  self.stage_id = stage.id
+
 
   def notify_dept_head(self):
       marketing_head=self.env['hr.department'].sudo().search([('name','=','Marketing')])
@@ -84,22 +105,43 @@ class LP_Crm(models.Model):
               'res_partner_id': self.lp_dept_head.partner_id.id,
               'notification_type': 'inbox'
           })]
-      print('osama')
+
       self.message_post(
-              body='Opportunity is Won!! ',
-              message_type="notification",
+              body='Opportunity won:          ' + str(self.name) +'-'
+                   +str(self.company_id.name) +'                                        '+'    Dears, ' +'We would like to inform you that the opportunity '
+                   +str(self.name)+
+                   ' - '
+                   +str(self.company_id.name) +
+                   ' is won.                regards',              message_type="notification",
               author_id=self.env.user.partner_id.id,
               notification_ids=notification_delivery)
       self.message_post(
-              body='Opportunity is Won!! ',
-              message_type="notification",
+              body='Opportunity won:          ' + str(self.name) +'-'
+                   +str(self.company_id.name) +'                                        '+'    Dears, ' +'We would like to inform you that the opportunity '
+                   +str(self.name)+
+                   ' - '
+                   +str(self.company_id.name) +
+                   ' is won.                regards',              message_type="notification",
+
               author_id=self.env.user.partner_id.id,
               notification_ids=notification_support)
       self.message_post(
-              body='Opportunity is Won!! ',
-              message_type="notification",
+              body='Opportunity won:          ' + str(self.name) +'-'
+                   +str(self.company_id.name) +'                                        '+'    Dears, ' +'We would like to inform you that the opportunity '
+                   +str(self.name)+
+                   ' - '
+                   +str(self.company_id.name) +
+                   ' is won.                regards',              message_type="notification",
               author_id=self.env.user.partner_id.id,
               notification_ids=notification_marketing)
+
+  def book_return_reminder(self):
+      template_id = self.env.ref('lp_crm.crm_reminder')
+      self.message_post_with_template(template_id.id)
+  @api.onchange('stage_id')
+  def onchange_stage_id(self):
+          if self.lp_go_ahead==True:
+              self.lp_stage_name = 'Won'
 
   def write(self, vals):
       if self.stage_id.name=='Won':
@@ -111,3 +153,5 @@ class LP_contact(models.Model):
   _inherit = 'res.partner'
 
 
+class LP_stages(models.Model):
+  _inherit = 'crm.stage'

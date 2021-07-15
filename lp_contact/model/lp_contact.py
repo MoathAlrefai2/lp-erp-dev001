@@ -8,18 +8,34 @@ class LP_Contact(models.Model):
                               ('lp_technical_influencer', 'Technical influencer'),
                               ('lp_technical', 'Technical'),('lp_information_provider', 'Information Provider')],
                             'Position', default="lp_technical")
-  lp_label = fields.Char('label for name.', default='ind_',readonly=True)
+  lp_label_name = fields.Char('label for name.', default='ind_',readonly=True)
+  lp_name = fields.Char('name label') #create new field to show the name without prefix ("ind_")
 
 
   def write(self, values):
-      prefix="ind_"
+    prefix="ind_"
+    try:
       if self.company_type == 'person':
-       try:
         if not self.name.startswith('ind_'):
-            values['name'] = prefix + values['name']
-            values['lp_label']=False
+            values['lp_name'] = prefix + values['name']
         else:
-            values['lp_label'] = False
-       except:
+            values['lp_name'] =  values['name']
+      else:
+          values['lp_name'] = values['name']
+    except:
            pass
-      return super(LP_Contact, self).write(values)
+
+    return super(LP_Contact, self).write(values)
+
+  @api.model
+  def create(self, values):
+        prefix = "ind_"
+        try:
+            if  values['company_type'] == 'person':
+               values['lp_name'] = prefix + values['name']
+            else:
+                values['lp_name'] = values['name']
+        except:
+            pass
+
+        return super(LP_Contact, self).create(values)

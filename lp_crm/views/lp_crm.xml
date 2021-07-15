@@ -5,19 +5,18 @@
     <field name="model">crm.lead</field>
     <field name="inherit_id" ref="crm.crm_lead_view_form" />
     <field name="arch" type="xml">
+        <xpath expr="//field[@name='stage_id']" position="replace">
+        		<field name="stage_id" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}" domain="['|', ('team_id', '=', team_id), ('team_id', '=', False)]" attrs="{'invisible': ['|', ('active', '=', False), ('type', '=', 'lead')]}" on_change="1" can_create="false" can_write="false" modifiers="{'invisible':['|',['active','=',false],['type','=','lead']]}" id="stage_id"/>
+        </xpath>
         <xpath expr="//button[@name='action_set_lost']" position="after">
-                                                    <button name="compute_going" string="Go Ahead"  type="object" groups="lp_crm.lp_group_crm_director" attrs="{'invisible' : [('lp_opportunity', '!=', 'new')]}" >
-                                              <field name="lp_go_ahead" widget="boolean_button" options='{"terminology": {
-        "string_true": "lp_go_ahead",
-        "hover_true": "lp_go_ahead",
-        "string_false": "Active",
-        "hover_false": "Active"
-    }}'/>
-                                          </button>
+<button name="Director_approver" class="oe_highlight" string="Go Ahead" type="object" groups="lp_crm.lp_group_crm_director" attrs="{'invisible' :['|', ('lp_stage_name', '!=', 'Qualified'), ('lp_director_viewer', '!=', True)]}"/>
         </xpath>
         <xpath expr="//field[@name='team_id']" position="after">
             <field name="lp_OneDrive_url" widget="url"/>
             <field name="lp_opportunity" />
+            <field name="lp_stage_name" invisible="1"/>
+            <field name="lp_go_ahead" invisible="1"/>
+            <field name="lp_director_viewer" invisible="1"/>
             <field name="lp_industry"/>
             <field name="lp_client_size"/>
             <field name="lp_director" widget="many2one_avatar_user" options="{'no_create': True}"/>
@@ -44,14 +43,11 @@
                                     </group>
                                       <group string="Extra Information"  colspan="8" col="4">
 
-                     <field name="lp_budget" />
-                     <field name="lp_budget_authority"/>
-                     <field name="lp_start_date"/>
+                     <field name="lp_budget" attrs="{'required' :[('lp_stage_name', '=', 'Prospect')]}"/>
+                     <field name="lp_budget_authority" attrs="{'required' :[('lp_stage_name', '=', 'Prospect')]}"/>
+                     <field name="lp_start_date" attrs="{'required' :[('lp_stage_name', '=', 'Prospect')]}"/>
                      <field name="lp_dept_head"  options="{'no_create': True}"/>
-                     <field name="lp_end_date"/>
-
-
-<!--                     <field name="lp_go_ahead" />-->
+                     <field name="lp_end_date" attrs="{'required' :[('lp_stage_name', '=', 'Prospect')]}"/>
                      <field name="lp_channel_source" string="Channel Source"/>
                      <field name="lp_others" string="Other Info" placeholder="add something.."/>
 
@@ -60,12 +56,7 @@
                </page>
     </xpath>
 
-
-
-<!--     domain="[('company_type', '=', 'person')]"     domain="[(('company_type', '=', 'person'), 'in', lp_company_id[0][2])]"   options="{'no_open':True,'no_create':1,'no_create_edit':1}"   attrs="{'required':[('kanban_state','=',False)]}"-->
-
-
-
     </field>
   </record>
+
 </odoo>
