@@ -1,5 +1,6 @@
 from odoo import models, fields, api
-
+import logging
+_logger = logging.getLogger(__name__)
 
 class LP_Contact(models.Model):
   _inherit = 'res.partner'
@@ -22,8 +23,8 @@ class LP_Contact(models.Model):
             values['lp_name'] =  values['name']
       else:
           values['lp_name'] = values['name']
-    except:
-           pass
+    except Exception as e:
+         _logger.exception(e)
 
     return super(LP_Contact, self).write(values)
 
@@ -35,7 +36,7 @@ class LP_Contact(models.Model):
                values['lp_name'] = prefix + values['name']
             else:
                 values['lp_name'] = values['name']
-        except:
-            pass
+        except Exception as e:
+             _logger.exception(e)
 
         return super(LP_Contact, self).create(values)

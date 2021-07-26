@@ -129,12 +129,31 @@ class LP_Project(models.Model):
         else:
             raise AccessError('Only Admin or project\'s DH can approve the change')
 
-
-    def insert_task(self,work_item):
+    def insert_task(self,wit_client,work_item):
         tmp_task = self.get_task(work_item)
         tmp_tags = self.get_tags(work_item)
         insert_counter = 0
         record = self.env['project.task'].create(tmp_task)
+        get_parent_list = self.get_source_id(record, wit_client)
+        if get_parent_list[0] != 0:
+            wiql_parent_1 = wit_client.get_work_item(int(get_parent_list[0]))
+            tmp_parent_requirement = self.get_parent_requirement(wiql_parent_1)
+            merge_dict = (tmp_task.update(tmp_parent_requirement))
+        else:
+            pass
+        if get_parent_list[1] != 0:
+            wiql_parent_2 = wit_client.get_work_item(int(get_parent_list[1]))
+            tmp_parent_feature = self.get_parent_feature(wiql_parent_2)
+            merge_dict = (tmp_task.update(tmp_parent_feature))
+        else:
+            pass
+        if get_parent_list[2] != 0:
+            wiql_parent_3 = wit_client.get_work_item(int(get_parent_list[2]))
+            tmp_parent_epic = self.get_parent_epic(wiql_parent_3)
+            merge_dict = (tmp_task.update(tmp_parent_epic))
+        else:
+            pass
+        record.write(tmp_task)
         insert_counter = insert_counter + 1
         try:
             if tmp_tags:
@@ -142,12 +161,92 @@ class LP_Project(models.Model):
         except:
             _logger.error('ERROR: tag has a problem on this task!')
         return insert_counter
-    def update_task(self,work_item,task):
+    def get_parent_requirement(self,work_ess):
+        tmp_req = ''
+        tmp_parent={}
+        try:
+         if "System.Title" in work_ess.fields:
+            if work_ess.fields["System.WorkItemType"] == 'Requirement':
+               tmp_req=work_ess.fields["System.Title"]
+         tmp_parent = {
+            'lp_devops_requirement': tmp_req
+         }
+        except :
+         _logger.error('ERROR: There is no parent for this task !')
+        return tmp_parent
+    def get_parent_feature(self,work_ess):
+        tmp_feature = ''
+        tmp_parent={}
+        try:
+         if "System.Title" in work_ess.fields:
+            if work_ess.fields["System.WorkItemType"] == 'Feature':
+               tmp_feature=work_ess.fields["System.Title"]
+         tmp_parent = {
+            'lp_devops_feature': tmp_feature
+         }
+        except :
+         _logger.error('ERROR: There is no parent for this task !')
+        return tmp_parent
+    def get_parent_epic(self,work_ess):
+        tmp_epic = ''
+        tmp_parent={}
+        try:
+         if "System.Title" in work_ess.fields:
+            if work_ess.fields["System.WorkItemType"] == 'Epic':
+               tmp_epic=work_ess.fields["System.Title"]
+         tmp_parent = {
+            'lp_devops_epic': tmp_epic
+         }
+        except :
+         _logger.error('ERROR: There is no parent for this task !')
+        return tmp_parent
+    def get_parent(self,work_ess):
+        tmp_req = ''
+        tmp_feature=''
+        tmp_epic=''
+        tmp_parent={}
+        try:
+         if "System.Title" in work_ess.fields:
+            if work_ess.fields["System.WorkItemType"] == 'Requirement':
+               tmp_req=work_ess.fields["System.Title"]
+            if work_ess.fields["System.WorkItemType"] == 'Feature':
+                tmp_feature = work_ess.fields["System.Title"]
+            if work_ess.fields["System.WorkItemType"]  == 'Epic':
+                tmp_epic = work_ess.fields["System.Title"]
+         tmp_parent = {
+            'lp_devops_requirement': tmp_req,
+            'lp_devops_feature': tmp_feature,
+            'lp_devops_epic': tmp_epic
+         }
+        except :
+         _logger.error('ERROR: There is no parent for this task !')
+        return tmp_parent
+
+    def update_task(self,wit_client,work_item,task):
         tmp_task = self.get_task(work_item)#tmp_task
         tmp_tags = self.get_tags(work_item)#tmp_tags
+        get_parent_list = self.get_source_id(task, wit_client)
+        if get_parent_list[0] != 0:
+            wiql_parent_1 = wit_client.get_work_item(int(get_parent_list[0]))
+            tmp_parent_requirement = self.get_parent_requirement(wiql_parent_1)
+            merge_dict = (tmp_task.update(tmp_parent_requirement))
+        else :
+            pass
+        if get_parent_list[1] != 0:
+                wiql_parent_2 = wit_client.get_work_item(int(get_parent_list[1]))
+                tmp_parent_feature = self.get_parent_feature(wiql_parent_2)
+                merge_dict = (tmp_task.update(tmp_parent_feature))
+        else:
+            pass
+        if get_parent_list[2] != 0:
+            wiql_parent_3 = wit_client.get_work_item(int(get_parent_list[2]))
+            tmp_parent_epic = self.get_parent_epic(wiql_parent_3)
+            merge_dict = (tmp_task.update(tmp_parent_epic))
+        else:
+            pass
         update_counter=0
         if "System.ChangedDate" in work_item.fields:
-            if task.lp_devops_changed_date != tmp_task.get('lp_devops_changed_date'):
+            #if task.lp_devops_changed_date != tmp_task.get('lp_devops_changed_date'):
              update_counter= update_counter+1
              task.write(tmp_task)
              try:
@@ -182,17 +281,19 @@ class LP_Project(models.Model):
         tmp_assigned_to = ''
         tmp_finish_date = ''
         tmp_priority = ''
-        tmp_Requirement = ''
         tmp_state = ''
         tmp_state_changedate = ''
         tags = ''
         tmp_task= {}
+        # if "System.Parent" in work_item.fields:
+        #     tmp_next = work_item.fields["System.Parent"]
+        #     print(tmp_next)
         if "Microsoft.VSTS.Common.StateChangeDate" in work_item.fields:
             tmp_state_changedate = datetime.strptime(work_item.fields["Microsoft.VSTS.Common.StateChangeDate"],"%Y-%m-%dT%H:%M:%S.%fz")  # use striptime because there was a difference between time (odoo,devops)
         else:
             tmp_state_changedate = False
-        if "Microsoft.VSTS.CMMI.RequirementType" in work_item.fields:
-            tmp_Requirement = work_item.fields["Microsoft.VSTS.CMMI.RequirementType"]
+        # if "Microsoft.VSTS.CMMI.RequirementType" in work_item.fields:
+        #     tmp_Requirement = work_item.fields["Microsoft.VSTS.CMMI.RequirementType"]
         if "System.Description" in work_item.fields:
             tmp_description = work_item.fields["System.Description"]
         if "System.TeamProject" in work_item.fields:
@@ -254,11 +355,41 @@ class LP_Project(models.Model):
             'lp_devops_priority': tmp_priority,
             'date_last_stage_update': tmp_state_changedate,
             'lp_task_state': tmp_state,
-            'lp_devops_requirement': tmp_Requirement,
-            'lp_devops_ref_id': work_item.id
+            'lp_devops_ref_id': work_item.id,
         }
         return tmp_task
-
+    def get_source_id(self,task,wit_client):
+        source_id_1=0
+        source_id_2=0
+        source_id_3=0
+        source_list=[]
+        ess1 = Wiql(query=f""" select[System.Id], [System.WorkItemType], [System.Title], [System.AssignedTo], [System.State] from WorkItemLinks where ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward') and (Target.[System.Id] = '{task.lp_devops_ref_id}') order by[System.Id] mode(Recursive, ReturnMatchingChildren)""")
+        ess_results = wit_client.query_by_wiql(ess1).work_item_relations
+        try:
+         for sublist in ess_results:
+            if sublist.target.id == task.lp_devops_ref_id:
+                if sublist.source:
+                    source_id_1 = int(sublist.source.id)
+        except:
+            pass
+        try:
+         for sublist in ess_results:
+            if sublist.target.id == source_id_1:
+                if sublist.source:
+                 source_id_2 = int(sublist.source.id)
+        except:
+         pass
+        try:
+         for sublist in ess_results:
+            if sublist.target.id == source_id_2:
+                if sublist.source:
+                 source_id_3 = int(sublist.source.id)
+        except:
+            pass
+        source_list.append(source_id_1)
+        source_list.append(source_id_2)
+        source_list.append(source_id_3)
+        return source_list
     def devops_sync(self):
         self.ensure_one()
         personal_access_token = self.lp_devops_token
@@ -266,15 +397,18 @@ class LP_Project(models.Model):
         project_name = self.lp_devops_project_name
         if (not personal_access_token) or (not organization_url) or (not project_name):
             raise ValidationError('Please check you DevOps token and DevOps project URL')
+
         credentials = BasicAuthentication('', personal_access_token)
         connection = VssConnection(base_url=organization_url, creds=credentials)
         wiql = Wiql(query=f"""select [System.Id] From WorkItems Where [System.WorkItemType] = 'Task' AND [System.TeamProject] = '{project_name}' order by [System.Id] desc""")
         wit_client = connection.get_client('vsts.work_item_tracking.v4_1.work_item_tracking_client.WorkItemTrackingClient')
         wiql_results = wit_client.query_by_wiql(wiql).work_items
         count_insert = 0
-        count_updates=0
+        count_updates = 0
         count_error_task = 0
-        if wiql_results:
+        source_id = 0
+        work_ess=[]
+        if wiql_results :
             tasks_to_be_synced = []
             odoo_task_ids = self.env['project.task'].search([('project_id', '=', self.id)]).ids
 
@@ -282,18 +416,18 @@ class LP_Project(models.Model):
                 try:
                  if task.lp_devops_ref_id: #odoo task already connected to devops task
                     work_item = wit_client.get_work_item(int(task.lp_devops_ref_id))
-                    count_updates = count_updates + self.update_task(work_item,task)
+                    count_updates = count_updates + self.update_task(wit_client,work_item,task)
                     tasks_to_be_synced.append(task.lp_devops_ref_id)
                 except Exception as e:
                        count_error_task = count_error_task + 1
                        _logger.exception(e)
 
-
+            tmp_devops_task=0
             tasks_to_be_inserted= [wit_client.get_work_item(int(tmp_devops_task.id)) for tmp_devops_task in wiql_results if tmp_devops_task.id not in tasks_to_be_synced]
             for work_item in tasks_to_be_inserted:
-                 try:
-                  count_insert = count_insert + self.insert_task(work_item)
-                 except Exception as e:
+                try:
+                  count_insert = count_insert + self.insert_task(wit_client,work_item)
+                except Exception as e:
                      count_error_task = count_error_task + 1
                      _logger.exception(e)
 
