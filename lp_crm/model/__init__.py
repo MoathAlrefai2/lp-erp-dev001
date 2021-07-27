@@ -1,1 +1,1 @@
-from . import Lp_crm
+from . import lp_crm

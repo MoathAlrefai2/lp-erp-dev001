@@ -1,12 +1,8 @@
 from odoo import models, fields, api
 
-class LP_mail(models.Model):
-  _inherit = 'mail.template'
 
 class LP_Crm(models.Model):
   _inherit = 'crm.lead'
-
-
   lp_company_id = fields.Many2one('res.partner', 'company')
   lp_individual_id = fields.Many2many('res.partner')
   lp_OneDrive_url = fields.Char('OneDrive folder URL')
@@ -76,31 +72,26 @@ class LP_Crm(models.Model):
 
   def Director_approver(self):
       self.ensure_one()
-      is_dh = self.env.user.id in self.env.ref('lp_crm.lp_group_crm_director').users.ids
-      if is_dh and self.env.user.id == self.lp_director.id:
-             if self.lp_go_ahead==False:
-              self.lp_go_ahead = True
-             stages1 = self.env['crm.stage'].sudo().search([('name', '=', 'Presentation')])
-             if not stages1:
-                             self.env['crm.stage'].sudo().create({'name': 'Presentation'})
-
-             if stages1:
-                  stage = stages1[0]
-                  self.stage_id = stage.id
+      is_da = self.env.user.id in self.env.ref('lp_crm.lp_group_crm_director').users.ids
+      if is_da and self.env.user.id == self.lp_director.id:
+        if self.lp_go_ahead==False:
+          self.lp_go_ahead = True
+        stage_presentation = self.env['crm.stage'].sudo().search([('name', '=', 'Presentation')])
+        if stage_presentation:
+         self.stage_id = stage_presentation[0].id
 
 
   def notify_dept_head(self):
       marketing_head=self.env['hr.department'].sudo().search([('name','=','Marketing')])
-      Support_head = self.env['hr.department'].sudo().search([('name', '=', 'Support')])
+      support_head = self.env['hr.department'].sudo().search([('name', '=', 'Support')])
       notification_marketing= [(0, 0, {
               'res_partner_id': marketing_head.manager_id.user_id.partner_id.id,
               'notification_type': 'inbox'
           })]
       notification_support= [(0, 0, {
-              'res_partner_id': Support_head.manager_id.user_id.partner_id.id,
+              'res_partner_id': support_head.manager_id.user_id.partner_id.id,
               'notification_type': 'inbox'
           })]
-      #marketing_head.manager_id.user_id.partner_id.id
       notification_delivery = [(0, 0, {
               'res_partner_id': self.lp_dept_head.partner_id.id,
               'notification_type': 'inbox'
@@ -135,9 +126,7 @@ class LP_Crm(models.Model):
               author_id=self.env.user.partner_id.id,
               notification_ids=notification_marketing)
 
-  def book_return_reminder(self):
-      template_id = self.env.ref('lp_crm.crm_reminder')
-      self.message_post_with_template(template_id.id)
+
   @api.onchange('stage_id')
   def onchange_stage_id(self):
           if self.lp_go_ahead==True:

@@ -12,31 +12,24 @@ class LP_Contact(models.Model):
   lp_label_name = fields.Char('label for name.', default='ind_',readonly=True)
   lp_name = fields.Char('name label') #create new field to show the name without prefix ("ind_")
 
-
+  def get_prefix_person(self,values):
+      prefix = "ind_"
+      try:
+              values['lp_name'] = prefix + values['name']
+      except Exception as e:
+          _logger.exception(e)
+      return values
   def write(self, values):
-    prefix="ind_"
-    try:
-      if self.company_type == 'person':
-        if not self.name.startswith('ind_'):
-            values['lp_name'] = prefix + values['name']
-        else:
-            values['lp_name'] =  values['name']
-      else:
-          values['lp_name'] = values['name']
-    except Exception as e:
-         _logger.exception(e)
-
+    if self.company_type == 'person':
+         values = self.get_prefix_person(values)
+    else:
+         values['lp_name'] = values['name']
     return super(LP_Contact, self).write(values)
 
   @api.model
   def create(self, values):
-        prefix = "ind_"
-        try:
-            if  values['company_type'] == 'person':
-               values['lp_name'] = prefix + values['name']
-            else:
-                values['lp_name'] = values['name']
-        except Exception as e:
-             _logger.exception(e)
-
+        if values['company_type'] == 'person':
+            values = self.get_prefix_person(values)
+        else:
+            values['lp_name'] = values['name']
         return super(LP_Contact, self).create(values)
