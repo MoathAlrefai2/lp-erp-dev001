@@ -4,7 +4,7 @@
     'summary': """
       Modifications for contact module , https://leading-point.com/""",
     'description': """
-      Modifications for contact
+      Modifications for CRM
   """,
 
     'author': "Leading Point",

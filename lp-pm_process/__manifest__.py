@@ -21,7 +21,7 @@
     # any module necessary for this one to work correctly
     'depends': ['project','mail','contacts'],
     'data': [
-        'security/groups.xml',
+        'security/lp_groups.xml',
         'security/ir.model.access.csv',
         'views/lp_project.xml',
         'views/lp_project_task.xml',

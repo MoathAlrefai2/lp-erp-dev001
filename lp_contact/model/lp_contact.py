@@ -10,7 +10,7 @@ class LP_Contact(models.Model):
                               ('lp_technical', 'Technical'),('lp_information_provider', 'Information Provider')],
                             'Position', default="lp_technical")
   lp_label_name = fields.Char('label for name.', default='ind_',readonly=True)
-  lp_name = fields.Char('name label') #create new field to show the name without prefix ("ind_")
+  lp_name = fields.Char('name label')
 
   def get_prefix_person(self,values):
       prefix = "ind_"

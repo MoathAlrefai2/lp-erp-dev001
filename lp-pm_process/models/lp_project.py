@@ -228,7 +228,6 @@ class LP_Project(models.Model):
         tmp_parent_epic = {}
         tmp_task = self.get_task(work_item)
         tmp_tags = self.get_tags(work_item)
-        print(tmp_tags)
         tmp_tags_id = {'tag_ids': tmp_tags}
         try:
             if tmp_tags:
@@ -237,27 +236,21 @@ class LP_Project(models.Model):
             _logger.error('ERROR: Tag has a problem on this task!')
         ess1 = Wiql(query=f""" select[System.Id], [System.WorkItemType], [System.Title], [System.AssignedTo], [System.State] from WorkItemLinks where ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Forward') and (Target.[System.Id] = '{tmp_task.get('lp_devops_ref_id')}') order by[System.Id] mode(Recursive, ReturnMatchingChildren)""")
         get_parent_list = wit_client.query_by_wiql(ess1).work_item_relations
-        try:
-            for sublist in get_parent_list:
+
+        for sublist in get_parent_list:
                 if sublist.target.id == tmp_task.get('lp_devops_ref_id'):
                     if sublist.source:
                         source_id_1 = int(sublist.source.id)
-        except:
-            pass
-        try:
-            for sublist in get_parent_list:
+
+        for sublist in get_parent_list:
                 if sublist.target.id == source_id_1:
                     if sublist.source:
                         source_id_2 = int(sublist.source.id)
-        except:
-            pass
-        try:
-            for sublist in get_parent_list:
+
+        for sublist in get_parent_list:
                 if sublist.target.id == source_id_2:
                     if sublist.source:
                         source_id_3 = int(sublist.source.id)
-        except:
-            pass
         source_list.append(source_id_1)
         source_list.append(source_id_2)
         source_list.append(source_id_3)
