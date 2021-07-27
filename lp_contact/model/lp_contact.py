@@ -23,7 +23,7 @@ class LP_Contact(models.Model):
     if self.company_type == 'person':
          values = self.get_prefix_person(values)
     else:
-         values['lp_name'] = values['name']
+         values['lp_name'] = self.name
     return super(LP_Contact, self).write(values)
 
   @api.model
@@ -31,5 +31,5 @@ class LP_Contact(models.Model):
         if values['company_type'] == 'person':
             values = self.get_prefix_person(values)
         else:
-            values['lp_name'] = values['name']
+            values['lp_name'] = self.name
         return super(LP_Contact, self).create(values)
