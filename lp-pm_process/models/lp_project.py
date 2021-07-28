@@ -303,7 +303,7 @@ class LP_Project(models.Model):
             odoo_task_ids = self.env['project.task'].search([('project_id', '=', self.id)]).ids
             for task in self.env['project.task'].browse(odoo_task_ids):
                 try:
-                 if task.lp_devops_ref_id: #odoo task already connected to devops task
+                 if task.lp_devops_ref_id:
                     work_item = wit_client.get_work_item(int(task.lp_devops_ref_id))
                     tmp_task = self.get_task(work_item)
                     count_updates = count_updates + self.update_task(tmp_task,task)
