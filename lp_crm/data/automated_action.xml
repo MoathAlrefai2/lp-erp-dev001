@@ -9,7 +9,7 @@
             <field name="filter_pre_domain">[["stage_id.name","in",["Negotiation","Dedicated Demo","Proposition","Presentation"]]]</field>
             <field name="code">
 if record.stage_id.name in ['Prospect','Qualified'] :
-    raise UserError('This action not allowed in this Stage!')
+    raise UserError('This action is not allowed in this stage!')
             </field>
         </record>
             <record id="test_rule_on_write_check_context" model="base.automation">
@@ -21,7 +21,7 @@ if record.stage_id.name in ['Prospect','Qualified'] :
                  <field name="filter_pre_domain">[["stage_id.name","=",'Won']]</field>
             <field name="code">
 if record.stage_id.name in ['Prospect','Presentation','Proposition','Dedicated Demo','Negotiation'] :
-    raise UserError('This action not allowed in this Stage!')
+    raise UserError('This action is not allowed in this stage!')
             </field>
         </record>
                 <record id="test_rule_on_write_check" model="base.automation">
@@ -47,7 +47,7 @@ if record.stage_id.name in ['Presentation','Dedicated Demo','Negotiation','Propo
 if record.stage_id.name in ['Won','Qualified'] and record.lp_budget == False and record.lp_budget_authority == False and record.lp_start_date == False and record.lp_end_date == False:
     raise UserError('Please check mandatory fields for this Opportunity!')
 if record.stage_id.name in ['Presentation','Dedicated Demo','Negotiation','Proposition'] :
-    raise UserError('This action not allowed in this Stage!')
+    raise UserError('This action is not allowed in this stage!')
 
             </field>
         </record>
