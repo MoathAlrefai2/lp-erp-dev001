@@ -9,7 +9,7 @@ class LP_Appraisal(models.Model):
     lp_date_from = fields.Date(string='Date From')
     lp_date_to = fields.Date(string='Date To')
     lp_salary = fields.Float(string='Salary')
-    lp_effective_date = fields.Date(string='Effective Date')
+    lp_effective_date = fields.Date(string='Effective Raise Date')
     lp_salary_raise = fields.Float(string='Salary Raise')
     lp_extra_points = fields.Float(string='Extra Points')
     lp_score_perc = fields.Float(string='Score Percantage',compute ='_compute_score_perc')
