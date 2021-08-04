@@ -18,5 +18,5 @@
     ],
     'version': '14.0.1',
      'category': 'Tools',
-    'depends': ['base','crm','contacts','mail']
+    'depends': ['base','crm','contacts','mail','base_automation']
 }

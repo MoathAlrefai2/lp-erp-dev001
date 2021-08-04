@@ -15,6 +15,6 @@
     ],
      'category': 'Tools',
     'depends':
-        ['hr','survey','base']
+        ['hr','survey','base','hr_appraisal']
 
 }
