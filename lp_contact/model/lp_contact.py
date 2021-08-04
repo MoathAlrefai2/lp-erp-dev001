@@ -20,16 +20,18 @@ class LP_Contact(models.Model):
           _logger.exception(e)
       return values
   def write(self, values):
+   if self.company_type:
     if self.company_type == 'person':
          values = self.get_prefix_person(values)
     else:
          values['lp_name'] = self.name
-    return super(LP_Contact, self).write(values)
+   return super(LP_Contact, self).write(values)
 
   @api.model
   def create(self, values):
+      if values['company_type']:
         if values['company_type'] == 'person':
             values = self.get_prefix_person(values)
         else:
             values['lp_name'] = self.name
-        return super(LP_Contact, self).create(values)
+      return super(LP_Contact, self).create(values)
