@@ -79,8 +79,8 @@ class LP_Appraisal(models.Model):
     def get_salary_job_position_create(self):
         if not self.id.origin and self.employee_id.id:
             last_employee_record = self.env['hr.appraisal'].search([('employee_id', '=', self.employee_id.id)], limit=1,order='create_date desc')
-            self.lp_salary = last_employee_record[0].lp_salary
-            self.lp_job_id =last_employee_record[0].lp_next_job_id
+            self.lp_salary = last_employee_record.lp_salary
+            self.lp_job_id =last_employee_record.lp_next_job_id
 
 
 
