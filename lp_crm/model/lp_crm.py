@@ -3,7 +3,7 @@ from odoo import models, fields, api
 
 class LP_Crm(models.Model):
   _inherit = 'crm.lead'
-  lp_company_id = fields.Many2one('res.partner', 'company')
+  lp_company_id = fields.Many2one('res.partner', 'company' , compute = '_compute_company')
   lp_individual_id = fields.Many2many('res.partner')
   lp_OneDrive_url = fields.Char('OneDrive folder URL')
   lp_client_size = fields.Char('Size of the client')
@@ -47,8 +47,8 @@ class LP_Crm(models.Model):
                               ('outsourcing_contracts', 'Outsourcing contracts'),
                               ('maintenance', 'Maintenance')],
                              'Opportunity Type', default="new")
-  lp_budget = fields.Char('Do they have budget for this opportunity?')
-  lp_budget_authority = fields.Char(' Authority to use budget')
+  lp_budget = fields.Selection([('yes', 'Yes'),('no', 'No')],'Do they have budget for this opportunity?')
+  lp_budget_authority = fields.Selection([('yes', 'Yes'),('no', 'No')],'Authority to use budget ?')
   lp_start_date = fields.Datetime('Start Date')
   lp_end_date = fields.Datetime('Finsh Date')
   lp_dept_head = fields.Many2one('res.users', string='Department head', domain=lambda self: [('id', 'in', self.env.ref('lp_crm.lp_group_crm_dept_head').users.ids)])
@@ -61,6 +61,14 @@ class LP_Crm(models.Model):
       compute='_compute_stage_id', readonly=False, store=True,
       copy=False, group_expand='_read_group_stage_ids', ondelete='restrict',
       domain="['|', ('team_id', '=', False), ('team_id', '=', team_id)]")
+  @api.constrains('lp_start_date', 'lp_end_date')
+  def check_dates(self):
+        if self.lp_start_date and self.lp_end_date:
+            if self.lp_start_date > self.lp_end_date:
+                raise UserError('The date from cannot be greater than date to')
+  @api.depends('partner_id')
+  def _compute_company(self):
+      self.lp_company_id = self.partner_id
 
   @api.depends('lp_director')
   def _driector_approve_viewer(self):
@@ -82,16 +90,45 @@ class LP_Crm(models.Model):
 
 
   def notify_dept_head(self):
-      marketing_head=self.env['hr.department'].sudo().search([('name','=','Marketing')])
-      support_head = self.env['hr.department'].sudo().search([('name', '=', 'Support')])
+     marketing_head=self.env['hr.department'].sudo().search([('name','=','Marketing')])
+     support_head = self.env['hr.department'].sudo().search([('name', '=', 'Support')])
+     Delivery = self.env['hr.department'].sudo().search([('name', '=', 'Delivery')])
+     if not marketing_head:
+        self.env['hr.department'].create({'name':'Marketing'})
+     if not support_head:
+         self.env['hr.department'].create({'name':'Support'})
+     if not Delivery:
+         self.env['hr.department'].create({'name':'Delivery'})
+     if marketing_head and marketing_head.manager_id.user_id.partner_id.id:
       notification_marketing= [(0, 0, {
               'res_partner_id': marketing_head.manager_id.user_id.partner_id.id,
               'notification_type': 'inbox'
           })]
-      notification_support= [(0, 0, {
+      self.message_post(
+              body='Opportunity won:          ' + str(self.name) +'-'
+                   +str(self.company_id.name) +'                                        '+'    Dears, ' +'We would like to inform you that the opportunity '
+                   +str(self.name)+
+                   ' - '
+                   +str(self.company_id.name) +
+                   ' is won.                regards',              message_type="notification",
+              author_id=self.env.user.partner_id.id,
+              notification_ids=notification_marketing)
+     if support_head and support_head.manager_id.user_id.partner_id.id:
+            notification_support= [(0, 0, {
               'res_partner_id': support_head.manager_id.user_id.partner_id.id,
               'notification_type': 'inbox'
-          })]
+             })]
+            self.message_post(
+              body='Opportunity won:          ' + str(self.name) +'-'
+                   +str(self.company_id.name) +'                                        '+'    Dears, ' +'We would like to inform you that the opportunity '
+                   +str(self.name)+
+                   ' - '
+                   +str(self.company_id.name) +
+                   ' is won.                regards',              message_type="notification",
+
+              author_id=self.env.user.partner_id.id,
+              notification_ids=notification_support)
+     if self.lp_dept_head.partner_id.id:
       notification_delivery = [(0, 0, {
               'res_partner_id': self.lp_dept_head.partner_id.id,
               'notification_type': 'inbox'
@@ -106,25 +143,6 @@ class LP_Crm(models.Model):
                    ' is won.                regards',              message_type="notification",
               author_id=self.env.user.partner_id.id,
               notification_ids=notification_delivery)
-      self.message_post(
-              body='Opportunity won:          ' + str(self.name) +'-'
-                   +str(self.company_id.name) +'                                        '+'    Dears, ' +'We would like to inform you that the opportunity '
-                   +str(self.name)+
-                   ' - '
-                   +str(self.company_id.name) +
-                   ' is won.                regards',              message_type="notification",
-
-              author_id=self.env.user.partner_id.id,
-              notification_ids=notification_support)
-      self.message_post(
-              body='Opportunity won:          ' + str(self.name) +'-'
-                   +str(self.company_id.name) +'                                        '+'    Dears, ' +'We would like to inform you that the opportunity '
-                   +str(self.name)+
-                   ' - '
-                   +str(self.company_id.name) +
-                   ' is won.                regards',              message_type="notification",
-              author_id=self.env.user.partner_id.id,
-              notification_ids=notification_marketing)
 
 
   @api.onchange('stage_id')

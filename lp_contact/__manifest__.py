@@ -15,6 +15,6 @@
     ],
      'category': 'Tools',
     'depends':[
-        'base','contacts'
+        'base','contacts','hr'
     ]
 }
