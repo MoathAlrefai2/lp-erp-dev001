@@ -47,8 +47,8 @@ class LP_Crm(models.Model):
                               ('outsourcing_contracts', 'Outsourcing contracts'),
                               ('maintenance', 'Maintenance')],
                              'Opportunity Type', default="new")
-  lp_budget = fields.Char('Do they have budget for this opportunity?')
-  lp_budget_authority = fields.Char(' Authority to use budget')
+  lp_budget = fields.Selection([('yes', 'Yes'),('no', 'No')],'Do they have budget for this opportunity?')
+  lp_budget_authority = fields.Selection([('yes', 'Yes'),('no', 'No')],'Authority to use budget ?')
   lp_start_date = fields.Datetime('Start Date')
   lp_end_date = fields.Datetime('Finsh Date')
   lp_dept_head = fields.Many2one('res.users', string='Department head', domain=lambda self: [('id', 'in', self.env.ref('lp_crm.lp_group_crm_dept_head').users.ids)])
