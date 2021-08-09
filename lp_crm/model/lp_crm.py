@@ -90,16 +90,45 @@ class LP_Crm(models.Model):
 
 
   def notify_dept_head(self):
-      marketing_head=self.env['hr.department'].sudo().search([('name','=','Marketing')])
-      support_head = self.env['hr.department'].sudo().search([('name', '=', 'Support')])
+     marketing_head=self.env['hr.department'].sudo().search([('name','=','Marketing')])
+     support_head = self.env['hr.department'].sudo().search([('name', '=', 'Support')])
+     Delivery = self.env['hr.department'].sudo().search([('name', '=', 'Delivery')])
+     if not marketing_head:
+        self.env['hr.department'].create({'name':'Marketing'})
+     if not support_head:
+         self.env['hr.department'].create({'name':'Support'})
+     if not Delivery:
+         self.env['hr.department'].create({'name':'Delivery'})
+     if marketing_head and marketing_head.manager_id.user_id.partner_id.id:
       notification_marketing= [(0, 0, {
               'res_partner_id': marketing_head.manager_id.user_id.partner_id.id,
               'notification_type': 'inbox'
           })]
-      notification_support= [(0, 0, {
+      self.message_post(
+              body='Opportunity won:          ' + str(self.name) +'-'
+                   +str(self.company_id.name) +'                                        '+'    Dears, ' +'We would like to inform you that the opportunity '
+                   +str(self.name)+
+                   ' - '
+                   +str(self.company_id.name) +
+                   ' is won.                regards',              message_type="notification",
+              author_id=self.env.user.partner_id.id,
+              notification_ids=notification_marketing)
+     if support_head and support_head.manager_id.user_id.partner_id.id:
+            notification_support= [(0, 0, {
               'res_partner_id': support_head.manager_id.user_id.partner_id.id,
               'notification_type': 'inbox'
-          })]
+             })]
+            self.message_post(
+              body='Opportunity won:          ' + str(self.name) +'-'
+                   +str(self.company_id.name) +'                                        '+'    Dears, ' +'We would like to inform you that the opportunity '
+                   +str(self.name)+
+                   ' - '
+                   +str(self.company_id.name) +
+                   ' is won.                regards',              message_type="notification",
+
+              author_id=self.env.user.partner_id.id,
+              notification_ids=notification_support)
+     if self.lp_dept_head.partner_id.id:
       notification_delivery = [(0, 0, {
               'res_partner_id': self.lp_dept_head.partner_id.id,
               'notification_type': 'inbox'
@@ -114,25 +143,6 @@ class LP_Crm(models.Model):
                    ' is won.                regards',              message_type="notification",
               author_id=self.env.user.partner_id.id,
               notification_ids=notification_delivery)
-      self.message_post(
-              body='Opportunity won:          ' + str(self.name) +'-'
-                   +str(self.company_id.name) +'                                        '+'    Dears, ' +'We would like to inform you that the opportunity '
-                   +str(self.name)+
-                   ' - '
-                   +str(self.company_id.name) +
-                   ' is won.                regards',              message_type="notification",
-
-              author_id=self.env.user.partner_id.id,
-              notification_ids=notification_support)
-      self.message_post(
-              body='Opportunity won:          ' + str(self.name) +'-'
-                   +str(self.company_id.name) +'                                        '+'    Dears, ' +'We would like to inform you that the opportunity '
-                   +str(self.name)+
-                   ' - '
-                   +str(self.company_id.name) +
-                   ' is won.                regards',              message_type="notification",
-              author_id=self.env.user.partner_id.id,
-              notification_ids=notification_marketing)
 
 
   @api.onchange('stage_id')
