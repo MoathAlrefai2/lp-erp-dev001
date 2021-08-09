@@ -8,7 +8,7 @@ class LP_Contact(models.Model):
   lp_name = fields.Char('name label',compute='onchange_name')
   lp_position = fields.Many2many('hr.job')
 
-  @api.onchange('lp_position')
+  @api.onchange('company_type')
   def onchange_create_position(self):
       lp_decision_maker = self.env['hr.job'].sudo().search([('name', '=', 'Decision maker')])
       lp_business_influencer = self.env['hr.job'].sudo().search([('name', '=', 'Business influencer')])
