@@ -3,7 +3,7 @@ from odoo import models, fields, api
 
 class LP_Crm(models.Model):
   _inherit = 'crm.lead'
-  lp_company_id = fields.Many2one('res.partner', 'company')
+  lp_company_id = fields.Many2one('res.partner', 'company' , compute = '_compute_company')
   lp_individual_id = fields.Many2many('res.partner')
   lp_OneDrive_url = fields.Char('OneDrive folder URL')
   lp_client_size = fields.Char('Size of the client')
@@ -61,6 +61,14 @@ class LP_Crm(models.Model):
       compute='_compute_stage_id', readonly=False, store=True,
       copy=False, group_expand='_read_group_stage_ids', ondelete='restrict',
       domain="['|', ('team_id', '=', False), ('team_id', '=', team_id)]")
+  @api.constrains('lp_start_date', 'lp_end_date')
+  def check_dates(self):
+        if self.lp_start_date and self.lp_end_date:
+            if self.lp_start_date > self.lp_end_date:
+                raise UserError('The date from cannot be greater than date to')
+  @api.depends('partner_id')
+  def _compute_company(self):
+      self.lp_company_id = self.partner_id
 
   @api.depends('lp_director')
   def _driector_approve_viewer(self):
