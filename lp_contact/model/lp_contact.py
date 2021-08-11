@@ -6,7 +6,7 @@ class LP_Contact(models.Model):
   _inherit = 'res.partner'
   lp_label_name = fields.Char('label for name.', default='ind_',readonly=True)
   lp_name = fields.Char('name label',compute='onchange_name')
-  lp_position = fields.Many2many('hr.job')
+  lp_attributes = fields.Many2many('hr.job')
 
 
   @api.depends('lp_name')
