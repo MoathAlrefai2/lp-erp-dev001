@@ -14,7 +14,7 @@
 'views/lp_contact.xml',
 'data/positions.xml'
     ],
-     'category': 'Tools',
+     'category': 'Leading Point',
     'depends':[
         'base','contacts','hr'
     ]

@@ -14,9 +14,10 @@
         'security/ir.model.access.csv',
         'data/stages_data.xml',
         'data/automated_action.xml',
+'data/lp_category.xml',
 'views/lp_crm.xml'
     ],
     'version': '14.0.1',
-     'category': 'Tools',
+     'category': 'Leading Point',
     'depends': ['base','crm','contacts','mail','base_automation']
 }
