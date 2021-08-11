@@ -92,13 +92,6 @@ class LP_Crm(models.Model):
   def notify_dept_head(self):
      marketing_head=self.env['hr.department'].sudo().search([('name','=','Marketing')])
      support_head = self.env['hr.department'].sudo().search([('name', '=', 'Support')])
-     Delivery = self.env['hr.department'].sudo().search([('name', '=', 'Delivery')])
-     if not marketing_head:
-        self.env['hr.department'].create({'name':'Marketing'})
-     if not support_head:
-         self.env['hr.department'].create({'name':'Support'})
-     if not Delivery:
-         self.env['hr.department'].create({'name':'Delivery'})
      if marketing_head and marketing_head.manager_id.user_id.partner_id.id:
       notification_marketing= [(0, 0, {
               'res_partner_id': marketing_head.manager_id.user_id.partner_id.id,

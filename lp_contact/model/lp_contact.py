@@ -8,23 +8,6 @@ class LP_Contact(models.Model):
   lp_name = fields.Char('name label',compute='onchange_name')
   lp_position = fields.Many2many('hr.job')
 
-  @api.onchange('company_type')
-  def onchange_create_position(self):
-      lp_decision_maker = self.env['hr.job'].sudo().search([('name', '=', 'Decision maker')])
-      lp_business_influencer = self.env['hr.job'].sudo().search([('name', '=', 'Business influencer')])
-      lp_technical_influencer = self.env['hr.job'].sudo().search([('name', '=', 'Technical influencer')])
-      lp_Technical = self.env['hr.job'].sudo().search([('name', '=', 'Technical')])
-      lp_information_provider = self.env['hr.job'].sudo().search([('name', '=', 'Information Provider')])
-      if not lp_decision_maker:
-          self.env['hr.job'].create({'name': 'Decision maker'})
-      if not lp_business_influencer:
-          self.env['hr.job'].create({'name': 'Business influencer'})
-      if not lp_technical_influencer:
-          self.env['hr.job'].create({'name': 'Technical influencer'})
-      if not lp_Technical:
-          self.env['hr.job'].create({'name': 'Technical'})
-      if not lp_information_provider:
-          self.env['hr.job'].create({'name': 'Information Provider'})
 
   @api.depends('lp_name')
   def onchange_name(self):

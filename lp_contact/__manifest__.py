@@ -11,7 +11,8 @@
     'author': "Leading Point",
     'website': "https://leading-point.com",
  'data': [
-'views/lp_contact.xml'
+'views/lp_contact.xml',
+'data/positions.xml'
     ],
      'category': 'Tools',
     'depends':[
