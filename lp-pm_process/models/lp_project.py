@@ -296,9 +296,9 @@ class LP_Project(models.Model):
      wit_client = self.get_wit_clients()
      try:
         wiql_results = wit_client.query_by_wiql(wiql).work_items
-        bool1 = False
+        check_workitem = False
         if not wiql_results:
-            bool1 = True
+            check_workitem = True
         count_insert = 0
         count_updates = 0
         count_error_task = 0
@@ -331,7 +331,7 @@ class LP_Project(models.Model):
             'view_mode': 'form',
             'view_type': 'form',
             'context': {'default_lp_updates_counter': count_updates, 'default_lp_insert_counter': count_insert,
-                        'default_lp_error_counter': count_error_task, 'default_lp_boolean': bool1 , 'default_lp_get_project': self.lp_devops_project_name},
+                        'default_lp_error_counter': count_error_task, 'default_lp_boolean': check_workitem , 'default_lp_get_project': self.lp_devops_project_name},
             'target': 'new'
         }
      except:
@@ -359,5 +359,5 @@ class LP_Popup_Wizard(models.TransientModel):
     lp_updates_counter = fields.Integer('Updated tasks:', readonly=True)
     lp_insert_counter = fields.Integer('Inserted tasks:', readonly=True)
     lp_error_counter = fields.Integer('Error tasks:', readonly=True)
-    lp_boolean = fields.Boolean('exists or not :')
+    lp_boolean = fields.Boolean('check exist workitem')
     lp_get_project= fields.Char('project name')
