@@ -268,7 +268,6 @@ class LP_Project(models.Model):
                         tmp_parent_feature = {'lp_devops_feature': tmp_feature}
         if source_list[2] != 0:
             wiql_parent_3 = wit_client.get_work_item(int(source_list[2]))
-            tmp_parent_epic = self.get_parent_epic(wiql_parent_3)
             if "System.Title" in wiql_parent_3.fields:
                     if wiql_parent_3.fields["System.WorkItemType"] == 'Epic':
                         tmp_epic = wiql_parent_3.fields["System.Title"]
@@ -281,20 +280,25 @@ class LP_Project(models.Model):
 
         return tmp_parent
     def get_wit_clients(self):
+
         credentials = BasicAuthentication('', self.lp_devops_token)
         connection = VssConnection(base_url=self.lp_devops_org_url, creds=credentials)
         wit_client = connection.get_client('vsts.work_item_tracking.v4_1.work_item_tracking_client.WorkItemTrackingClient')
         return wit_client
     def devops_sync(self):
-        self.ensure_one()
-        personal_access_token = self.lp_devops_token
-        organization_url = self.lp_devops_org_url
-        project_name = self.lp_devops_project_name
-        if (not personal_access_token) or (not organization_url) or (not project_name):
+     self.ensure_one()
+     personal_access_token = self.lp_devops_token
+     organization_url = self.lp_devops_org_url
+     project_name = self.lp_devops_project_name
+     if (not personal_access_token) or (not organization_url) or (not project_name):
             raise ValidationError('Please check you DevOps token and DevOps project URL')
-        wiql = Wiql(query=f"""select [System.Id] From WorkItems Where [System.WorkItemType] = 'Task' AND [System.TeamProject] = '{project_name}' order by [System.Id] desc""")
-        wit_client = self.get_wit_clients()
+     wiql = Wiql(query=f"""select [System.Id] From WorkItems Where [System.WorkItemType] = 'Task' AND [System.TeamProject] = '{project_name}' order by [System.Id] desc""")
+     wit_client = self.get_wit_clients()
+     try:
         wiql_results = wit_client.query_by_wiql(wiql).work_items
+        check_workitem = False
+        if not wiql_results:
+            check_workitem = True
         count_insert = 0
         count_updates = 0
         count_error_task = 0
@@ -311,7 +315,6 @@ class LP_Project(models.Model):
                 except Exception as e:
                        count_error_task = count_error_task + 1
                        _logger.exception(e)
-
             tmp_devops_task=0
             tasks_to_be_inserted= [wit_client.get_work_item(int(tmp_devops_task.id)) for tmp_devops_task in wiql_results if tmp_devops_task.id not in tasks_to_be_synced]
             for work_item in tasks_to_be_inserted:
@@ -321,16 +324,18 @@ class LP_Project(models.Model):
                 except Exception as e:
                      count_error_task = count_error_task + 1
                      _logger.exception(e)
-
-            return {
+        return {
             'name': 'Information',
             'type': 'ir.actions.act_window',
             'res_model': 'project.wizard',
             'view_mode': 'form',
             'view_type': 'form',
-            'context':{'default_lp_updates_counter':count_updates , 'default_lp_insert_counter':count_insert,'default_lp_error_counter':count_error_task},
+            'context': {'default_lp_updates_counter': count_updates, 'default_lp_insert_counter': count_insert,
+                        'default_lp_error_counter': count_error_task, 'default_lp_boolean': check_workitem , 'default_lp_get_project': self.lp_devops_project_name},
             'target': 'new'
-                }
+        }
+     except:
+         raise ValidationError('There is an error in DevOps token or in DevOps project URL!')
     def get_email(self, AssignedTo=''):
         email = ''
         try:
@@ -354,5 +359,5 @@ class LP_Popup_Wizard(models.TransientModel):
     lp_updates_counter = fields.Integer('Updated tasks:', readonly=True)
     lp_insert_counter = fields.Integer('Inserted tasks:', readonly=True)
     lp_error_counter = fields.Integer('Error tasks:', readonly=True)
-
-
+    lp_boolean = fields.Boolean('check exist workitem')
+    lp_get_project= fields.Char('project name')

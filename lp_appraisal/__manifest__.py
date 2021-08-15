@@ -13,7 +13,7 @@
      'security/ir.model.access.csv',
 'views/lp_appraisal.xml'
     ],
-     'category': 'Tools',
+     'category': 'Leading Point',
     'depends':
         ['hr','survey','base','hr_appraisal']
 
