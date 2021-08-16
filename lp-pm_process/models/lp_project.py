@@ -44,7 +44,7 @@ class LP_Project(models.Model):
     lp_devops_token = fields.Char('Token')
     lp_devops_org_url = fields.Char('Organization URL', readonly=True)
     lp_devops_project_name = fields.Char('Project Name', readonly=True)
-
+    _wit_client = None
     def notify_dept_head(self, message):
         if self.lp_proposed_budget or self.lp_proposed_date_start or self.lp_proposed_date_end:
          notification_ids = [(0, 0, {
@@ -280,21 +280,21 @@ class LP_Project(models.Model):
 
         return tmp_parent
     def get_wit_clients(self):
-
+      if getattr(self, '_wit_client', None) is None:
         credentials = BasicAuthentication('', self.lp_devops_token)
         connection = VssConnection(base_url=self.lp_devops_org_url, creds=credentials)
-        wit_client = connection.get_client('vsts.work_item_tracking.v4_1.work_item_tracking_client.WorkItemTrackingClient')
-        return wit_client
+        _wit_client = connection.get_client('vsts.work_item_tracking.v4_1.work_item_tracking_client.WorkItemTrackingClient')
+      return _wit_client
     def devops_sync(self):
-     self.ensure_one()
-     personal_access_token = self.lp_devops_token
-     organization_url = self.lp_devops_org_url
-     project_name = self.lp_devops_project_name
-     if (not personal_access_token) or (not organization_url) or (not project_name):
-            raise ValidationError('Please check you DevOps token and DevOps project URL')
-     wiql = Wiql(query=f"""select [System.Id] From WorkItems Where [System.WorkItemType] = 'Task' AND [System.TeamProject] = '{project_name}' order by [System.Id] desc""")
-     wit_client = self.get_wit_clients()
-     try:
+      self.ensure_one()
+      personal_access_token = self.lp_devops_token
+      organization_url = self.lp_devops_org_url
+      project_name = self.lp_devops_project_name
+      if (not personal_access_token) or (not organization_url) or (not project_name):
+        raise ValidationError('Please check you DevOps token and DevOps project URL')
+      wiql = Wiql(query=f"""select [System.Id] From WorkItems Where [System.WorkItemType] = 'Task' AND [System.TeamProject] = '{project_name}' order by [System.Id] desc""")
+      try:
+        wit_client = self.get_wit_clients()
         wiql_results = wit_client.query_by_wiql(wiql).work_items
         check_workitem = False
         if not wiql_results:
@@ -334,8 +334,8 @@ class LP_Project(models.Model):
                         'default_lp_error_counter': count_error_task, 'default_lp_boolean': check_workitem , 'default_lp_get_project': self.lp_devops_project_name},
             'target': 'new'
         }
-     except:
-         raise ValidationError('There is an error in DevOps token or in DevOps project URL!')
+      except:
+         raise ValidationError('Please check DevOps Token and DevOps Project URL!')
     def get_email(self, AssignedTo=''):
         email = ''
         try:
