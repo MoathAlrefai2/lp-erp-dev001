@@ -8,6 +8,14 @@ class LP_Contact(models.Model):
   lp_name = fields.Char('name label',compute='onchange_name')
   lp_attributes = fields.Many2many('hr.job')
 
+  lp_attributes = fields.Many2many('hr.job',domain=lambda self:[('id','in',self.execute_domain())])
+  def execute_domain(self):
+   attributes_names =['Technical','Decision maker','Business influencer','Technical influencer','Information Provider']
+   id_list=[]
+   for name in attributes_names:
+      j=self.env['hr.job'].with_context(lang='en_US').search([('name', '=', str(name))]).id
+      id_list.append(j)
+   return id_list
 
   @api.depends('lp_name')
   def onchange_name(self):

@@ -10,8 +10,7 @@
         </xpath>
            <xpath expr="//field[@name='type']" position="after">
 
-             <field name="lp_attributes" string="Attributes" options="{'no_open':True,'no_create':1,'no_create_edit':1}" widget="many2many_tags" attrs="{'invisible' : [('company_type', '=', 'company')]}" domain="['|','|','|','|', ('name', '=', 'Decision maker'), ('name', '=', 'Business influencer'), ('name', '=', 'Technical influencer'), ('name', '=', 'Technical'), ('name', '=', 'Information Provider')]" />
-
+             <field name="lp_attributes" string="Attributes" options="{'no_open':True,'no_create':1,'no_create_edit':1}" widget="many2many_tags" attrs="{'invisible' : [('company_type', '=', 'company')]}"  />
            </xpath>
             <xpath expr="//field[@name='name']" position="replace">
                 <div class="address_format">
