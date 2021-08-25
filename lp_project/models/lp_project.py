@@ -33,7 +33,7 @@ class LP_Project(models.Model):
     lp_budget = fields.Char('Budget', readonly=True, tracking=True)
     date_start = fields.Date(readonly=True, tracking=True)
     lp_date_end = fields.Date('End Date', readonly=True, tracking=True)
-    lp_approver = fields.Many2one('res.users', string='Approver (Dept. Head)', domain=lambda self: [('id', 'in', self.env.ref('lp-pm_process.lp_group_project_approver').users.ids)], tracking=True)
+    lp_approver = fields.Many2one('res.users', string='Approver (Dept. Head)', domain=lambda self: [('id', 'in', self.env.ref('lp_project.lp_group_project_approver').users.ids)], tracking=True)
 
     lp_proposed_budget = fields.Char('Proposed Budget', tracking=True)
     lp_proposed_date_start = fields.Date('Proposed Start Date', tracking=True)
@@ -92,7 +92,7 @@ class LP_Project(models.Model):
     def approve_proposed_values(self):
         self.ensure_one()
         is_admin = self.env.user.has_group('base.user_admin')
-        is_dh = self.env.user.id in self.env.ref('lp-pm_process.lp_group_project_approver').users.ids
+        is_dh = self.env.user.id in self.env.ref('lp_project.lp_group_project_approver').users.ids
         if is_admin or (is_dh and self.env.user.id == self.lp_approver.id):
             if self.lp_proposed_budget :
                self.lp_budget = self.lp_proposed_budget
